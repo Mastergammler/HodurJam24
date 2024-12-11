@@ -6,5 +6,6 @@ release
 .build
 .obj
 log.txt
+logs
 
 compile_commands.json

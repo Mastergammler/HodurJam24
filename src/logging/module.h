@@ -1,6 +1,6 @@
 #pragma once
 
-#include "import.h"
+#include "imports.h"
 
 struct Logger
 {
@@ -13,7 +13,7 @@ struct Logger
     bool running;
 };
 
-void InitLogger();
+void InitLogger(bool consoleInstantFlush = false);
 void DisposeLogger();
 void Log(string s);
 void Logf(const string message, ...);
