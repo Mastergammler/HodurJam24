@@ -4,6 +4,8 @@
 
 #include "types.h"
 
+#include "map/types.h"
+
 #define NAMEOF(x) #x
 
 static const char DELIMITER = ':';

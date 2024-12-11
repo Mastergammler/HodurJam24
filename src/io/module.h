@@ -10,3 +10,8 @@ bool file_exists(string filePath);
 string extract_file_name(string filePath);
 
 vector<FileEntry> directory_files(const string directory);
+
+/**
+ * Reads a file line by line and returns the result
+ */
+vector<string> read_all_lines(const string filePath);

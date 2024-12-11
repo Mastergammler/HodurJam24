@@ -1,4 +1,5 @@
 #include "internal.h"
+#include "map.h"
 #include "utils/parsing.cpp"
 
 void InitInputs()
@@ -36,6 +37,15 @@ void Game_Init(ExitCallback exitFunction)
 {
     ExitFunction = exitFunction;
     InitInputs();
+
+    // TODO: test loading time
+    Map map = LoadMap("test01");
+
+    for (int i = 0; i < map.total_tiles; i++)
+    {
+        Tile t = map.tiles[i];
+        Logf("%i: (%i,%i)", t.type, t.position.x, t.position.y);
+    }
 
     Log("Game initalized successfully");
 }

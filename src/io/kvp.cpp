@@ -1,4 +1,5 @@
 #include "module.h"
+#include "utils.cpp"
 
 vector<FileEntry> directory_files(const string directory)
 {
@@ -27,18 +28,6 @@ vector<FileEntry> directory_files(const string directory)
     }
 
     return files;
-}
-
-bool VerifyFile(ifstream& file, string path)
-{
-    if (!file.is_open())
-    {
-        char buffer[MAX_PATH];
-        GetCurrentDirectoryA(MAX_PATH, buffer);
-        Logf("Did not find file '%s'. Current dir '%s'", path.c_str(), buffer);
-        return false;
-    }
-    return true;
 }
 
 void Trim(string& str)
