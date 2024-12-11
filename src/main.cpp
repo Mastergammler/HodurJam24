@@ -1,12 +1,5 @@
-#include "imports.h"
-
-#include "io/module.h"
-#include "logging/module.h"
+#include "game/module.h"
 #include "timing/module.h"
-#include "win32/module.h"
-
-static const char DELIMITER = ':';
-static const string INPUT_CONF = "configs/keyboard.conf";
 
 static bool running = true;
 
@@ -20,7 +13,7 @@ void LogCmdArgs()
     vector<string> cmdArgs = ReadArguments();
     for (int i = 0; i < cmdArgs.size(); i++)
     {
-        Logf("Found argument: %s", cmdArgs[i].c_str());
+        Logf("Cmd argument: %s", cmdArgs[i].c_str());
     }
 }
 
@@ -29,28 +22,26 @@ int WinMain(HINSTANCE instance,
             LPSTR lpCmdLine,
             int nShowCmd)
 {
-    InitLogger();
+    Logger_Init();
+    Timer_Init();
     LogCmdArgs();
 
     HWND window = InitializeWindow("EscapeRoomGame", instance, CloseProgram);
     HDC hdc = GetDC(window);
 
-    // TODO: should be controlled by the game
-    unordered_map<string, string> keyMappings = read_kvp_file(INPUT_CONF,
-                                                              DELIMITER);
-    Timer_Init();
-    Input_Init(keyMappings);
+    Game_Init(CloseProgram);
 
-    Log("Hodur Jam 24");
-
+    Log("running game");
     while (running)
     {
         Timer_Update();
         HandleMessages(window);
+        Game_Update();
         // rendering
         WaitTillNextFrame(window);
     }
 
-    DisposeLogger();
+    Game_Dispose();
+    Logger_Dispose();
     return 0;
 }

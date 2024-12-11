@@ -13,8 +13,8 @@ struct Logger
     bool running;
 };
 
-void InitLogger(bool consoleInstantFlush = false);
-void DisposeLogger();
+void Logger_Init(bool consoleInstantFlush = false);
+void Logger_Dispose();
 void Log(string s);
 void Logf(const string message, ...);
 string format(const string message, ...);

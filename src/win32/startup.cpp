@@ -1,12 +1,11 @@
 #include "module.h"
 
-#define NAMEOF(x) #x
-
-KeyInput* FindInput(string name)
+KeyInput* FindInput(InputState* input, string name)
 {
-    for (auto& keyInput : Input.All)
+    for (int i = 0; i < input->count; i++)
     {
-        if (keyInput.identifier == name) return &keyInput;
+        if (input->key_states[i].identifier == name)
+            return &input->key_states[i];
     }
 
     return NULL;
@@ -49,44 +48,15 @@ size_t GetSpecialKeyCode(const string& keyId)
     }
 }
 
-// TODO: use lower case names only?
-// -> Adjust for map also?
-string TrimToVariableName(string s)
+// TODO: Feature: direct keycode input -> workaround for unsupported keys?
+// -> Should i do this, or just put in all the keys???
+void Input_Init(InputState* states, unordered_map<string, string> keyMappings)
 {
-    size_t pos = s.find_last_of('.');
-    return pos == string::npos ? s : s.substr(pos + 1);
-}
-
-void InitIdentifiers()
-{
-    // TODO: renames within the macro don't work -> bit annoying
-    Input.Exit.identifier = TrimToVariableName(NAMEOF(Input.Exit));
-    Input.Action.identifier = TrimToVariableName(NAMEOF(Input.Action));
-    Input.TurnLeft.identifier = TrimToVariableName(NAMEOF(Input.TurnLeft));
-    Input.TurnRight.identifier = TrimToVariableName(NAMEOF(Input.TurnRight));
-    Input.MoveForward.identifier = TrimToVariableName(
-                                            NAMEOF(Input.MoveForward));
-    Input.MoveBackward.identifier = TrimToVariableName(
-                                            NAMEOF(Input.MoveBackward));
-    Input.MoveLeft.identifier = TrimToVariableName(NAMEOF(Input.MoveLeft));
-    Input.MoveRight.identifier = TrimToVariableName(NAMEOF(Input.MoveRight));
-    Input.Log.identifier = TrimToVariableName(NAMEOF(Input.Log));
-    Input.Debug.identifier = TrimToVariableName(NAMEOF(Input.Debug));
-    Input.Mixer.identifier = TrimToVariableName(NAMEOF(Input.Mixer));
-    Input.Fire.identifier = TrimToVariableName(NAMEOF(Input.Fire));
-    Input.Manual.identifier = TrimToVariableName(NAMEOF(Input.Manual));
-    Input.Skip.identifier = TrimToVariableName(NAMEOF(Input.Skip));
-}
-
-// TODO: Feature: include keycode direct input -> that way it's a workaround for
-// non supported special characters
-void Input_Init(unordered_map<string, string> keyMappings)
-{
-    InitIdentifiers();
+    InputStates = states;
 
     for (const auto& [key, value] : keyMappings)
     {
-        KeyInput* input = FindInput(key);
+        KeyInput* input = FindInput(InputStates, key);
         if (!input)
         {
             Logf("Unused key mapping: %s", key.c_str());

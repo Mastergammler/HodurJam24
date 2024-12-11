@@ -37,30 +37,13 @@ struct KeyInput
     bool released;
 };
 
-// TODO: this should not be module dependant, i should have this somewhere else
-// ... -> this should really live in the game module
 struct InputState
 {
-    static const int KeyCount = 14;
-    KeyInput All[KeyCount];
-
-    KeyInput& Exit = All[0];
-    KeyInput& Action = All[1];
-    KeyInput& MoveForward = All[2];
-    KeyInput& MoveBackward = All[3];
-    KeyInput& MoveLeft = All[4];
-    KeyInput& MoveRight = All[5];
-    KeyInput& TurnLeft = All[6];
-    KeyInput& TurnRight = All[7];
-    KeyInput& Log = All[8];
-    KeyInput& Debug = All[9];
-    KeyInput& Mixer = All[10];
-    KeyInput& Fire = All[11];
-    KeyInput& Manual = All[12];
-    KeyInput& Skip = All[13];
+    KeyInput* key_states;
+    int count;
 };
 
-static InputState Input;
+static InputState* InputStates;
 
 HWND InitializeWindow(string name,
                       HINSTANCE instance,
@@ -77,10 +60,10 @@ vector<string> ReadArguments();
  *
  * Needs to be called every time before messages are handled
  */
-void Input_ResetKeyStates();
+void Input_ResetKeyStates(InputState* state);
 void HandleMessages(HWND window);
 
 /**
  * Loads the key configuration for input handling
  */
-void Input_Init(unordered_map<string, string> keyMappings);
+void Input_Init(InputState* inputs, unordered_map<string, string> keyMappings);

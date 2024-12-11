@@ -2,9 +2,9 @@
 
 void Input_ResetKeyStates()
 {
-    for (int i = 0; i < Input.KeyCount; i++)
+    for (int i = 0; i < InputStates->count; i++)
     {
-        KeyInput* currentKey = &Input.All[i];
+        KeyInput* currentKey = &InputStates->key_states[i];
 
         currentKey->released = false;
         currentKey->pressed = false;
@@ -49,9 +49,9 @@ void HandleKeyboardInput(LPARAM lParam, WPARAM wParam)
         return;
     }
 
-    for (int i = 0; i < Input.KeyCount; i++)
+    for (int i = 0; i < InputStates->count; i++)
     {
-        KeyInput* input = &Input.All[i];
+        KeyInput* input = &InputStates->key_states[i];
         if (input->keycode == vkCode)
         {
             SetKeyState(wasDown, isDown, *input);

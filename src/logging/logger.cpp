@@ -63,7 +63,7 @@ string GetTimeString(const char* format = "%Y-%m-%d %H:%M:%S")
 }
 
 // TODO: option for instant flush (debug mode)
-void InitLogger(bool consoleInstantFlush)
+void Logger_Init(bool consoleInstantFlush)
 {
     InitOutputStreams();
 
@@ -109,7 +109,7 @@ void StopLogger(Logger& logger)
     logger.log_file.close();
 }
 
-void DisposeLogger()
+void Logger_Dispose()
 {
     StopLogger(logger);
 }
