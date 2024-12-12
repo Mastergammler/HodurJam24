@@ -37,6 +37,7 @@ void Game_Init(ExitCallback exitFunction)
 {
     ExitFunction = exitFunction;
     InitInputs();
+    Audio_Init();
 
     // TODO: test loading time
     Map map = LoadMap("test01");
@@ -44,7 +45,7 @@ void Game_Init(ExitCallback exitFunction)
     for (int i = 0; i < map.total_tiles; i++)
     {
         Tile t = map.tiles[i];
-        Logf("%i: (%i,%i)", t.type, t.position.x, t.position.y);
+        // Logf("%i: (%i,%i)", t.type, t.position.x, t.position.y);
     }
 
     Log("Game initalized successfully");
@@ -52,5 +53,6 @@ void Game_Init(ExitCallback exitFunction)
 
 void Game_Dispose()
 {
+    Audio_Dispose();
     Log("Game: Happy exit.");
 }

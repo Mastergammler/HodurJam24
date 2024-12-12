@@ -1,4 +1,5 @@
 #include "logging/compile.cpp"
+#include "audio/compile.cpp"
 #include "game/compile.cpp"
 #include "io/compile.cpp"
 #include "timing/compile.cpp"
