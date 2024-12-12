@@ -41,18 +41,36 @@ void PlayTest(const string filePath)
          wfx.nSamplesPerSec,
          buffer.size());
 
+    BYTE* data = new BYTE[buffer.size()];
+    for (int i = 0; i < buffer.size(); i++)
+    {
+        data[i] = buffer[i];
+    }
+
     XAUDIO2_BUFFER audioBuffer = {};
-    audioBuffer.pAudioData = (BYTE*)buffer.data();
+    audioBuffer.pAudioData = data;
     audioBuffer.AudioBytes = buffer.size();
-    audioBuffer.Flags = XAUDIO2_END_OF_STREAM;
+    // audioBuffer.Flags = XAUDIO2_END_OF_STREAM;
+
+    Log("Buffer OK");
+
+    if (!Audio.initalized)
+    {
+        Logf("Audio not initialized: %08x - %s",
+             Audio.error_code,
+             Audio.error_msg.c_str());
+    }
 
     IXAudio2SourceVoice* voice;
-    HRESULT hr = Mixer.audio_device->CreateSourceVoice(&voice, &wfx);
+    HRESULT hr = Audio.audio_device->CreateSourceVoice(&voice, &wfx);
     if (FAILED(hr)) Log("Error creating source voice");
 
+    Log("Sourcevoice OK");
     hr = voice->SubmitSourceBuffer(&audioBuffer);
     if (FAILED(hr)) Log("Error submitting source buffer");
 
+    Log("submitBufffer");
     hr = voice->Start();
     if (FAILED(hr)) Log("Error starting playback");
+    Log("Start OK");
 }

@@ -4533,6 +4533,7 @@ static __inline void vorbis_fpu_restore(vorbis_fpu_control fpu){
 
 /* Optimized code path for x86_64 builds. Uses SSE2 intrinsics. This can be
    done safely because all x86_64 CPUs supports SSE2. */
+/* TODO: why are the simd intrinsics not working?
 #if (defined(_MSC_VER) && defined(_M_X64)) || (defined(__GNUC__) && defined (__SSE2_MATH__))
 #  define VORBIS_FPU_CONTROL
 
@@ -4551,7 +4552,8 @@ static __inline void vorbis_fpu_restore(vorbis_fpu_control fpu){
   (void)fpu;
 }
 
-#endif /* Special MSVC x64 implementation */
+#endif
+*//* Special MSVC x64 implementation */
 
 
 /* If no special implementation was found for the current compiler / platform,

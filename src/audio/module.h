@@ -5,7 +5,7 @@
 #include "imports.h"
 #include "types.h"
 
-static AudioMaster Mixer = {};
+static AudioMaster Audio = {};
 
 void Audio_Init();
 void Audio_Dispose();

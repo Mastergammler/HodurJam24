@@ -4,8 +4,6 @@
  * conversions
  */
 
-#include <emmintrin.h> // For SSE2 intrinsics
-
 #define OGG_IMPL
 #define VORBIS_IMPL
 

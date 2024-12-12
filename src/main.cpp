@@ -27,8 +27,9 @@ int WinMain(HINSTANCE instance,
     LogCmdArgs();
 
     HWND window = InitializeWindow("EscapeRoomGame", instance, CloseProgram);
-    // HDC hdc = GetDC(window); for rendering
+    HDC hdc = GetDC(window);
 
+    timeBeginPeriod(1);
     Game_Init(CloseProgram);
 
     while (running)
@@ -41,6 +42,7 @@ int WinMain(HINSTANCE instance,
     }
 
     Game_Dispose();
+    timeEndPeriod(1);
     Logger_Dispose();
     return 0;
 }

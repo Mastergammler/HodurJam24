@@ -9,53 +9,53 @@ void Audio_Init()
     if (FAILED(hr))
 
     {
-        Mixer.error_code = hr;
-        Mixer.error_msg = "COM initalization failed";
+        Audio.error_code = hr;
+        Audio.error_msg = "COM initalization failed";
         return;
     }
 
-    if (FAILED(hr = XAudio2Create(&Mixer.audio_device,
+    if (FAILED(hr = XAudio2Create(&Audio.audio_device,
                                   0,
                                   XAUDIO2_DEFAULT_PROCESSOR)))
     {
-        Mixer.error_msg = "Audio Device initalization failed";
-        Mixer.error_code = hr;
+        Audio.error_msg = "Audio Device initalization failed";
+        Audio.error_code = hr;
         return;
     }
 
-    if (FAILED(hr = Mixer.audio_device->CreateMasteringVoice(&Mixer.master)))
+    if (FAILED(hr = Audio.audio_device->CreateMasteringVoice(&Audio.master)))
     {
-        Mixer.error_msg = "Master voice initalization failde";
-        Mixer.error_code = hr;
+        Audio.error_msg = "Master voice initalization failde";
+        Audio.error_code = hr;
         return;
     }
 
     DWORD channelMask;
-    if (FAILED(hr = Mixer.master->GetChannelMask(&channelMask)))
+    if (FAILED(hr = Audio.master->GetChannelMask(&channelMask)))
     {
-        Mixer.error_msg = "Unable to determine output channel count";
-        Mixer.error_code = hr;
+        Audio.error_msg = "Unable to determine output channel count";
+        Audio.error_code = hr;
     }
 
     XAUDIO2_VOICE_DETAILS deviceDetails;
-    Mixer.master->GetVoiceDetails(&deviceDetails);
-    Mixer.channel_mask = channelMask;
-    Mixer.output_channels = __builtin_popcount(channelMask);
-    Mixer.sample_rate = deviceDetails.InputSampleRate;
+    Audio.master->GetVoiceDetails(&deviceDetails);
+    Audio.channel_mask = channelMask;
+    Audio.output_channels = __builtin_popcount(channelMask);
+    Audio.sample_rate = deviceDetails.InputSampleRate;
 
     Logf("Audio device output channels: %d - sample rate:  %d",
-         Mixer.output_channels,
-         Mixer.sample_rate);
+         Audio.output_channels,
+         Audio.sample_rate);
 
-    Mixer.initalized = true;
+    Audio.initalized = true;
 }
 
 void Audio_Dispose()
 {
     // TODO: release reverb effects etc
-    if (Mixer.verb_mix) Mixer.verb_mix->DestroyVoice();
-    if (Mixer.master) Mixer.master->DestroyVoice();
-    if (Mixer.audio_device) Mixer.audio_device->Release();
+    if (Audio.verb_mix) Audio.verb_mix->DestroyVoice();
+    if (Audio.master) Audio.master->DestroyVoice();
+    if (Audio.audio_device) Audio.audio_device->Release();
 
     CoUninitialize();
 }

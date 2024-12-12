@@ -60,17 +60,17 @@ LIB_PATHS="$SDK_LIBS"
 INCLUDE_PRECOMPILED="-include-pch $PRECOMPILE_OUTPUT"
 TARGET="-target x86_64-pc-win32 -fuse-ld=lld"
 LINKED_LIBS="-lgdi32 -luser32 -lole32 -lshell32 -lwinmm -lmfreadwrite -lmfplat -lmfuuid -lxaudio2"
-OPTIONS="$DEBUG -Wall -Wpedantic -Wno-c99-extensions -Wno-c++17-extensions $PROFILE -DDEBUG -msse2" 
+OPTIONS="$DEBUG -Wall -Wpedantic -Wno-c99-extensions -Wno-c++17-extensions $PROFILE -DDEBUG" 
 
 # -D_AMD64_ or -DX86_ = 1 is required for some windows headers
-MSVC_DEFAULTS="$TARGET $INCLUDES $CPP_STD -D_AMD64_=1"
+MSVC_DEFAULTS="$TARGET $INCLUDES -D_AMD64_=1"
 
 PRE_COMPILE_START=$(date +%s%N)
 
 # h for headers
 if [[ "$*" == *"-h"* ]]; then
-    clang -c $C_FILES -o $C_FILES_OUTPUT $TARGET $INCLUDES -w -msse2 #$INCLUDES -msse4 #$LIB_PATHS $LINKED_LIBS
-    clang++ -x c++-header $PRECOMPILE_FILE -o $PRECOMPILE_OUTPUT $MSVC_DEFAULTS $DEBUG -msse2
+    clang -c $C_FILES -o $C_FILES_OUTPUT $MSVC_DEFAULTS -w #-msse $LIB_PATHS $LINKED_LIBS
+    clang++ -x c++-header $PRECOMPILE_FILE -o $PRECOMPILE_OUTPUT $MSVC_DEFAULTS $CPP_STD $DEBUG
 fi
 
 PRE_COMPILE_END=$(date +%s%N)
@@ -78,7 +78,7 @@ START_TIME=$(date +%s%N)
 
 #TODO: cleaner setup for this
 
-clang++ $SOURCE_FILE $C_FILES_OUTPUT -o $OUTPUT_FILE $INCLUDE_PRECOMPILED $MSVC_DEFAULTS $LIB_PATHS $LINKED_LIBS $OPTIONS
+clang++ $SOURCE_FILE $C_FILES_OUTPUT -o $OUTPUT_FILE $INCLUDE_PRECOMPILED $MSVC_DEFAULTS $CPP_STD $LIB_PATHS $LINKED_LIBS $OPTIONS
 COMPILE_STATUS=$?
 
 END_TIME=$(date +%s%N)
