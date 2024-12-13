@@ -23,13 +23,13 @@ int WinMain(HINSTANCE instance,
             int nShowCmd)
 {
     Logger_Init();
+    timeBeginPeriod(1);
     Timer_Init();
     LogCmdArgs();
 
     HWND window = InitializeWindow("EscapeRoomGame", instance, CloseProgram);
-    HDC hdc = GetDC(window);
+    // HDC hdc = GetDC(window);
 
-    timeBeginPeriod(1);
     Game_Init(CloseProgram);
 
     while (running)

@@ -20,6 +20,9 @@ TileType ParseTileType(char c)
 
 Map LoadMap(string name)
 {
+    Clock fileClock = {};
+    Measure_Start(fileClock);
+
     bool validMap = true;
     vector<string> lines = read_all_lines(MAP_REL_DIR + name + MAP_EXT);
     vector<char> columnData;
@@ -67,6 +70,9 @@ Map LoadMap(string name)
             currentTile->type = ParseTileType(columnData[i]);
             currentTile->position = {curCol, curRow};
         }
+
+        float time = Measure_Elapsed(fileClock);
+        Logf("Successfully loaded map %s within %.2fms", name.c_str(), time);
 
         return map;
     }

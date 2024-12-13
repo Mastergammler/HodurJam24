@@ -1,25 +1,40 @@
 #include "module.h"
 
-void PlayTest(const string filePath)
+/**
+ * Ogg Vorbis alsways uses 16 bits per sample
+ */
+static const int OGG_BITS_PER_SAMLE = 16;
+
+void LoadOggAsPcm(AudioData& audio, const string filePath)
 {
+    Clock fileClock = {};
+    Measure_Start(fileClock);
+
+    audio.file_path = filePath;
+    audio.file_name = extract_file_name(filePath);
+
     OggVorbis_File vf;
     if (ov_fopen(filePath.c_str(), &vf) != 0)
     {
-        Logf("Unable to open file for playback: %s", filePath.c_str());
+        Logf("Could not open ogg file for loading audio: %s", filePath.c_str());
         return;
     }
 
     vorbis_info* vi = ov_info(&vf, -1);
 
-    WAVEFORMATEX wfx = {};
-    wfx.wFormatTag = WAVE_FORMAT_PCM;
-    wfx.nChannels = vi->channels;
-    wfx.nSamplesPerSec = vi->rate;
-    wfx.wBitsPerSample = 16; // ogg vorbis is always 16
-    wfx.nBlockAlign = wfx.nChannels * (wfx.wBitsPerSample / 8);
-    wfx.nAvgBytesPerSec = wfx.nSamplesPerSec * wfx.nBlockAlign;
-    wfx.cbSize = 0;
+    audio.wfx.wFormatTag = WAVE_FORMAT_PCM;
+    audio.wfx.nChannels = vi->channels;
+    audio.wfx.nSamplesPerSec = vi->rate;
+    audio.wfx.wBitsPerSample = OGG_BITS_PER_SAMLE;
+    audio.wfx.nBlockAlign = audio.wfx.nChannels *
+                            (audio.wfx.wBitsPerSample / 8);
+    audio.wfx.nAvgBytesPerSec = audio.wfx.nSamplesPerSec *
+                                audio.wfx.nBlockAlign;
+    audio.wfx.cbSize = 0;
 
+    // TODO: just have a concurrent strip of pre allocated memory to load all
+    // audio into
+    //  instead of copying and allocating this twice
     vector<char> buffer;
     int bitstream;
     long bytesRead;
@@ -36,41 +51,58 @@ void PlayTest(const string filePath)
         buffer.insert(buffer.end(), readBuffer, readBuffer + bytesRead);
     }
 
-    Logf("Loading file with %i channels %i sps and %i bytes",
-         wfx.nChannels,
-         wfx.nSamplesPerSec,
-         buffer.size());
-
-    BYTE* data = new BYTE[buffer.size()];
-    for (int i = 0; i < buffer.size(); i++)
+    audio.byte_count = buffer.size();
+    audio.data = new BYTE[audio.byte_count];
+    for (int i = 0; i < audio.byte_count; i++)
     {
-        data[i] = buffer[i];
+        audio.data[i] = buffer[i];
+    }
+
+    audio.channels = audio.wfx.nChannels;
+    audio.samples_per_s = audio.wfx.nSamplesPerSec;
+    // block align is the byte count per concurrent sample (all channels)
+    audio.sample_count = audio.byte_count / audio.wfx.nBlockAlign;
+    audio.length_in_s = (float)audio.sample_count / audio.samples_per_s;
+
+    audio.initalized = true;
+
+    float loadingTime = Measure_Elapsed(fileClock);
+    Logf("Loading %s (%i x %.2fs) | %.2fms",
+         filePath.c_str(),
+         audio.channels,
+         audio.length_in_s,
+         loadingTime);
+}
+
+void PlayNewAudio(AudioData* audio)
+{
+    if (!AudioDevice.initalized)
+    {
+        Logf("AudioDevice not initialized: %08x - %s",
+             AudioDevice.error_code,
+             AudioDevice.error_msg.c_str());
+        return;
+    }
+
+    if (!audio->initalized)
+    {
+        Logf("Trying to play uninitialized audio: %s",
+             audio->file_name.c_str());
+        return;
     }
 
     XAUDIO2_BUFFER audioBuffer = {};
-    audioBuffer.pAudioData = data;
-    audioBuffer.AudioBytes = buffer.size();
-    // audioBuffer.Flags = XAUDIO2_END_OF_STREAM;
-
-    Log("Buffer OK");
-
-    if (!Audio.initalized)
-    {
-        Logf("Audio not initialized: %08x - %s",
-             Audio.error_code,
-             Audio.error_msg.c_str());
-    }
+    audioBuffer.pAudioData = audio->data;
+    audioBuffer.AudioBytes = audio->byte_count;
 
     IXAudio2SourceVoice* voice;
-    HRESULT hr = Audio.audio_device->CreateSourceVoice(&voice, &wfx);
+    HRESULT hr = AudioDevice.audio_device->CreateSourceVoice(&voice,
+                                                             &audio->wfx);
     if (FAILED(hr)) Log("Error creating source voice");
 
-    Log("Sourcevoice OK");
     hr = voice->SubmitSourceBuffer(&audioBuffer);
     if (FAILED(hr)) Log("Error submitting source buffer");
 
-    Log("submitBufffer");
     hr = voice->Start();
     if (FAILED(hr)) Log("Error starting playback");
-    Log("Start OK");
 }
