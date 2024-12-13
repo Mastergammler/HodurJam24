@@ -9,12 +9,24 @@ TileType ParseTileType(char c)
     switch (toupper(c))
     {
         case '0': return STONE;
-        case '1': return MOSSY_STONE;
+        case '1': return CARPET;
         case '2': return WOOD;
         case 'C': return CHEST;
         case 'D': return DOOR;
         case 'O': return PILLAR;
         default: return WALL;
+    }
+}
+
+// TODO: this should maybe be a definition file or something?
+bool IsWalkable(TileType type)
+{
+    switch (type)
+    {
+        case STONE:
+        case CARPET:
+        case WOOD: return true;
+        default: return false;
     }
 }
 
@@ -69,6 +81,7 @@ Map LoadMap(string name)
 
             currentTile->type = ParseTileType(columnData[i]);
             currentTile->position = {curCol, curRow};
+            currentTile->is_walkable = IsWalkable(currentTile->type);
         }
 
         float time = Measure_Elapsed(fileClock);

@@ -26,7 +26,7 @@ void InitInputs()
     GameInputs.Fire.identifier = TrimToVariableName(NAMEOF(GameInputs.Fire));
     GameInputs.Manual.identifier = TrimToVariableName(
                                             NAMEOF(GameInputs.Manual));
-    GameInputs.Skip.identifier = TrimToVariableName(NAMEOF(GameInputs.Skip));
+    GameInputs.Reset.identifier = TrimToVariableName(NAMEOF(GameInputs.Reset));
 
     unordered_map<string, string> keyMappings = read_kvp_file(INPUT_CONF,
                                                               DELIMITER);
@@ -38,14 +38,41 @@ void LoadAudio()
     Clock loadAudioClock = {};
     Measure_Start(loadAudioClock);
 
-    // LoadOggAsPcm(Audio.TestAudio, "res/TrashSong_Mix2_mq.ogg");
-
     vector<FileEntry> files = directory_files("res/fx");
 
     Audio.fx_count = files.size();
     Audio.Fx = new AudioData[Audio.fx_count]();
+
+    FxInfo lastInfo = {};
     for (int i = 0; i < Audio.fx_count; i++)
     {
+        for (const auto& pair : FX_MAPPING)
+        {
+            if (starts_with(files[i].file_name, pair.first))
+            {
+                if (lastInfo.type != pair.second)
+                {
+                    if (i > 0)
+                    {
+                        Audio.fx_mapping.insert({lastInfo.type, lastInfo});
+                        lastInfo = {};
+                    }
+                    lastInfo.start_idx = i;
+                    lastInfo.type = pair.second;
+                }
+
+                lastInfo.count++;
+                break;
+            }
+        }
+
+        // TODO: very ugly logic
+        if (i == Audio.fx_count - 1)
+        {
+            // insert the last one
+            Audio.fx_mapping.insert({lastInfo.type, lastInfo});
+        }
+
         LoadOggAsPcm(Audio.Fx[i], files[i].path);
     }
 
@@ -61,8 +88,6 @@ void Game_Init(ExitCallback exitFunction)
 
     // TODO: do in background, else it takes forever to start etc
     LoadAudio();
-
-    Map map = LoadMap("test01");
 
     Log("Game initalized successfully");
 }

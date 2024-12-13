@@ -1,52 +1,11 @@
 #include "../imports.h"
-
-struct Vector2
-{
-    int x, y;
-};
-
-enum TileType
-{
-    /**
-     * '-'
-     */
-    WALL,
-
-    /**
-     * No 0
-     */
-    STONE,
-
-    /**
-     * No 1
-     */
-    MOSSY_STONE,
-
-    /**
-     * No 2
-     */
-    WOOD,
-
-    /**
-     * 'C'
-     */
-    CHEST,
-
-    /**
-     * 'D'
-     */
-    DOOR,
-
-    /**
-     * 'O'
-     */
-    PILLAR
-};
+#include "../types.h"
 
 struct Tile
 {
     TileType type;
-    Vector2 position;
+    v2 position;
+    bool is_walkable;
 };
 
 inline ostream& operator<<(ostream& os, const Tile& obj)
@@ -75,3 +34,5 @@ struct Map
     int columns;
     int total_tiles;
 };
+
+
