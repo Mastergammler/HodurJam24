@@ -11,7 +11,7 @@
 static const char DELIMITER = ':';
 static const string INPUT_CONF = "configs/keyboard.conf";
 
-static HodurInputState GameInputs = {14, new KeyInput[14]};
+static HodurInputState GameInputs = {18, new KeyInput[18]};
 static ExitCallback ExitFunction;
 static LoadedAudio Audio;
 static Map CurrentMap = {0, 0};

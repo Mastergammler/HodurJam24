@@ -27,6 +27,10 @@ void InitInputs()
     GameInputs.Manual.identifier = TrimToVariableName(
                                             NAMEOF(GameInputs.Manual));
     GameInputs.Reset.identifier = TrimToVariableName(NAMEOF(GameInputs.Reset));
+    GameInputs.F1.identifier = TrimToVariableName(NAMEOF(GameInputs.F1));
+    GameInputs.F2.identifier = TrimToVariableName(NAMEOF(GameInputs.F2));
+    GameInputs.F3.identifier = TrimToVariableName(NAMEOF(GameInputs.F3));
+    GameInputs.F4.identifier = TrimToVariableName(NAMEOF(GameInputs.F4));
 
     unordered_map<string, string> keyMappings = read_kvp_file(INPUT_CONF,
                                                               DELIMITER);

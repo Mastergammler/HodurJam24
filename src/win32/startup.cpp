@@ -33,7 +33,11 @@ static const unordered_map<string, size_t> SpecialCharacterMap = {
                                         {"SHIFT", VK_SHIFT},
                                         {"ALT", VK_MENU},
                                         {"TAB", VK_TAB},
-                                        {"QM", VK_OEM_2}};
+                                        {"QM", VK_OEM_2},
+                                        {"F1", VK_F1},
+                                        {"F2", VK_F2},
+                                        {"F3", VK_F3},
+                                        {"F4", VK_F4}};
 
 size_t GetSpecialKeyCode(const string& keyId)
 {

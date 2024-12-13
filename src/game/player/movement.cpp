@@ -35,18 +35,14 @@ void HandleMovement()
 
     if (nextTile.is_walkable)
     {
-        // play tile sound
         Player.position = nextPosition;
+        // play 2 sounds etc & lock player etc
+    }
 
-        // TODO: this can crash, if the type is not there ...
+    if (Audio.fx_mapping.find(nextTile.type) != Audio.fx_mapping.end())
+    {
         FxInfo fxInfo = Audio.fx_mapping[nextTile.type];
-
         int idxOffset = rand() % fxInfo.count;
         PlayNewAudio(&Audio.Fx[fxInfo.start_idx + idxOffset]);
-    }
-    else
-    {
-        // don't move + play bump sound
-        // but bump sound == tile sound?
     }
 }

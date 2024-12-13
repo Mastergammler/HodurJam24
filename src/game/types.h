@@ -26,11 +26,10 @@ struct HodurInputState : InputState
           MoveRight(key_states[5]), TurnLeft(key_states[6]),
           TurnRight(key_states[7]), Log(key_states[8]), Debug(key_states[9]),
           Mixer(key_states[10]), Fire(key_states[11]), Manual(key_states[12]),
-          Reset(key_states[13])
+          Reset(key_states[13]), F1(key_states[14]), F2(key_states[15]),
+          F3(key_states[16]), F4(key_states[17])
     {
     }
-
-    // TODO: FKeys for loading specific levels
 
     KeyInput& Exit;
     KeyInput& Action;
@@ -46,6 +45,10 @@ struct HodurInputState : InputState
     KeyInput& Fire;
     KeyInput& Manual;
     KeyInput& Reset;
+    KeyInput& F1;
+    KeyInput& F2;
+    KeyInput& F3;
+    KeyInput& F4;
 };
 
 // TODO: this is not a good solution ...
