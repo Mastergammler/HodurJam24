@@ -30,6 +30,13 @@ bool IsWalkable(TileType type)
     }
 }
 
+// TODO: I can impove this to be way more flexible
+//  - i don't need to do the akward column check
+//  - i have it in a way, where every element is only 1 char,
+//    thefore i can parse it accordingly
+//  -> Even with only whitespace, so it still works!!!
+//  - I can even go through it and just parse by char count, without a need for
+//  a separator
 Map LoadMap(string name)
 {
     Clock fileClock = {};

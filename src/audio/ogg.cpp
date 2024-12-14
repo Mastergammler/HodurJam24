@@ -1,4 +1,7 @@
 #include "module.h"
+#include <winerror.h>
+#include <winnt.h>
+#include <xaudio2.h>
 
 /**
  * Ogg Vorbis alsways uses 16 bits per sample
@@ -74,35 +77,169 @@ void LoadOggAsPcm(AudioData& audio, const string filePath)
          loadingTime);
 }
 
-void PlayNewAudio(AudioData* audio)
+bool ValidateAudio(AudioData* audio)
 {
     if (!AudioDevice.initalized)
     {
         Logf("AudioDevice not initialized: %08x - %s",
              AudioDevice.error_code,
              AudioDevice.error_msg.c_str());
-        return;
+        return false;
     }
 
     if (!audio->initalized)
     {
-        Logf("Trying to play uninitialized audio: %s",
-             audio->file_name.c_str());
+        Logf("Audio is not initalized: %s", audio->file_name.c_str());
+        return false;
+    }
+
+    return true;
+}
+
+void CreateVoiceForAudio(AudioData* audio, VoiceSettings& settings)
+{
+    if (!ValidateAudio(audio)) return;
+
+    // the format info is based on the audio we're playing
+    settings.voice_wfx = audio->wfx;
+    settings.error_code = AudioDevice.audio_device->CreateSourceVoice(
+                                            &settings.voice,
+                                            &settings.voice_wfx,
+                                            XAUDIO2_VOICE_USEFILTER);
+
+    if (FAILED(settings.error_code))
+    {
+        settings.error_msg = format("Could not create source voice for audio "
+                                    "%s",
+                                    audio->file_name.c_str());
         return;
     }
+
+    settings.initalized = true;
+}
+
+bool ValidatePlayback(AudioData* audio, VoiceSettings* settings)
+{
+    if (!ValidateAudio(audio)) return false;
+
+    if (!settings->initalized)
+    {
+        Logf("Voice is not initalized: %s", settings->error_msg.c_str());
+        return false;
+    }
+
+    // NOTE: the FormatTag and BitsPerSample also need to stay the same
+    //  but since im only using PCM and ogg files these naturally never change
+    if (settings->voice_wfx.nChannels != audio->channels)
+    {
+        Logf("Audio and voice have different amount of channels: %i (audio) : "
+             "%i (voice)",
+             audio->channels,
+             settings->voice_wfx.nChannels);
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * from -1 (full left) to 1.0 (full right)
+ * 0 for center
+ */
+void PanVoice(VoiceSettings* settings, float pan)
+{
+    int voiceChannels = settings->voice_wfx.nChannels;
+
+    if (pan > 1) pan = 1;
+    if (pan < -1) pan = -1;
+
+    float left = 0.5f - pan / 2;
+    float right = 0.5f + pan / 2;
+
+    float* outputMatrix = new float[voiceChannels *
+                                    AudioDevice.output_channels];
+
+    if (voiceChannels == 1)
+    {
+        outputMatrix[0] = left;
+        outputMatrix[1] = right;
+    }
+    else if (voiceChannels == 2)
+    {
+        outputMatrix[0] = left;
+        // left source to right output
+        outputMatrix[1] = 0;
+        // right source to left output
+        outputMatrix[2] = 0;
+        outputMatrix[3] = right;
+    }
+    else
+    {
+        Log("Panning for more than 2 channels is not implemented!");
+    }
+
+    HRESULT hr = settings->voice->SetOutputMatrix(NULL,
+                                                  voiceChannels,
+                                                  AudioDevice.output_channels,
+                                                  outputMatrix);
+    if (FAILED(hr))
+    {
+        string msg = system_category().message(hr);
+        Logf("Setting output matrix failed! %d: %s", hr, msg.c_str());
+    }
+}
+
+void ApplyLowpass(VoiceSettings* settings, float lowpassValue)
+{
+    XAUDIO2_FILTER_PARAMETERS filterParams;
+    filterParams.Type = LowPassFilter;
+    // cutoff frequency from 0 - 1
+    filterParams.Frequency = lowpassValue;
+    // steepness / shelf?
+    filterParams.OneOverQ = 1;
+
+    HRESULT hr = settings->voice->SetFilterParameters(&filterParams);
+    if (FAILED(hr))
+    {
+        string msg = system_category().message(hr);
+        Logf("Setting lowpass filter with value %.2f failed %d: %s",
+             lowpassValue,
+             hr,
+             msg.c_str());
+    }
+}
+
+void PlayAudioNow(AudioData* audio, PlaybackSettings playback)
+{
+    if (!ValidatePlayback(audio, playback.settings)) return;
 
     XAUDIO2_BUFFER audioBuffer = {};
     audioBuffer.pAudioData = audio->data;
     audioBuffer.AudioBytes = audio->byte_count;
 
-    IXAudio2SourceVoice* voice;
-    HRESULT hr = AudioDevice.audio_device->CreateSourceVoice(&voice,
-                                                             &audio->wfx);
-    if (FAILED(hr)) Log("Error creating source voice");
+    IXAudio2SourceVoice* voice = playback.settings->voice;
+
+    HRESULT hr = voice->Stop();
+    if (FAILED(hr)) Log("Error stoping currently playing audio!");
+
+    hr = voice->FlushSourceBuffers();
+    if (FAILED(hr)) Log("Error flushing source buffers!");
 
     hr = voice->SubmitSourceBuffer(&audioBuffer);
-    if (FAILED(hr)) Log("Error submitting source buffer");
+    if (FAILED(hr))
+        Logf("Error submitting source buffer for file: %s",
+             audio->file_name.c_str());
+
+    hr = voice->SetVolume(playback.volume);
+    if (FAILED(hr))
+        Logf("Error setting volume to %.2f for audio %s",
+             playback.volume,
+             audio->file_name.c_str());
+
+    PanVoice(playback.settings, playback.pan);
+    ApplyLowpass(playback.settings, playback.lowpass_filter);
 
     hr = voice->Start();
-    if (FAILED(hr)) Log("Error starting playback");
+    if (FAILED(hr))
+        Logf("Error starting playback for audio %s", audio->file_name.c_str());
 }

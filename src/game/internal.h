@@ -2,17 +2,13 @@
 
 #include "module.h"
 
-#include "types.h"
-
 #include "map/types.h"
+#include "player/types.h"
 
-#define NAMEOF(x) #x
+static const float STEP_ANIM_TIME = .55f;
 
-static const char DELIMITER = ':';
-static const string INPUT_CONF = "configs/keyboard.conf";
-
-static HodurInputState GameInputs = {18, new KeyInput[18]};
 static ExitCallback ExitFunction;
+static HodurInputState GameInputs = {18, new KeyInput[18]};
 static LoadedAudio Audio;
 static Map CurrentMap = {0, 0};
 static Player Player;

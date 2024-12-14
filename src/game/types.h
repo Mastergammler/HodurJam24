@@ -107,8 +107,3 @@ struct LoadedAudio
 
     unordered_map<TileType, FxInfo> fx_mapping;
 };
-
-struct Player
-{
-    v2 position;
-};

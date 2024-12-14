@@ -23,7 +23,8 @@ void Audio_Init()
         return;
     }
 
-    if (FAILED(hr = AudioDevice.audio_device->CreateMasteringVoice(&AudioDevice.master)))
+    if (FAILED(hr = AudioDevice.audio_device->CreateMasteringVoice(
+                                                       &AudioDevice.master)))
     {
         AudioDevice.error_msg = "Master voice initalization failde";
         AudioDevice.error_code = hr;
@@ -47,13 +48,40 @@ void Audio_Init()
          AudioDevice.output_channels,
          AudioDevice.sample_rate);
 
+    // not actually needed, because i can apply a lowpass on the voice itself
+    // -> but maybe for actual reverb?
+    if (FAILED(hr = AudioDevice.audio_device->CreateSubmixVoice(
+                                                       &AudioDevice.effect_mix,
+                                                       1,
+                                                       AudioDevice.sample_rate,
+                                                       0)))
+    {
+        Log("Initalization of effect mix failed");
+        AudioDevice.error_msg = "Initalization of effect mix failed";
+        AudioDevice.error_code = hr;
+    }
+
+    XAUDIO2_FILTER_PARAMETERS filterParams;
+    filterParams.Type = LowPassFilter;
+    // cutoff frequency
+    filterParams.Frequency = 0.5;
+    // steepness / shelf?
+    filterParams.OneOverQ = 1;
+
+    if (FAILED(hr = AudioDevice.effect_mix->SetFilterParameters(&filterParams)))
+    {
+        Log("Could not apply filter parameters");
+        AudioDevice.error_msg = "Could not apply filter parameters";
+        AudioDevice.error_code = hr;
+    }
+
     AudioDevice.initalized = true;
 }
 
 void Audio_Dispose()
 {
     // TODO: release reverb effects etc
-    if (AudioDevice.verb_mix) AudioDevice.verb_mix->DestroyVoice();
+    if (AudioDevice.effect_mix) AudioDevice.effect_mix->DestroyVoice();
     if (AudioDevice.master) AudioDevice.master->DestroyVoice();
     if (AudioDevice.audio_device) AudioDevice.audio_device->Release();
 

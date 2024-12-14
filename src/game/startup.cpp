@@ -84,6 +84,14 @@ void LoadAudio()
     Logf("|::| All audio loaded within %.2fms", time);
 }
 
+void CreateVoices()
+{
+    // TODO: better choosing of the fx
+    CreateVoiceForAudio(&Audio.Fx[0], Player.left_foot);
+    CreateVoiceForAudio(&Audio.Fx[0], Player.right_foot);
+    CreateVoiceForAudio(&Audio.Fx[0], Player.body);
+}
+
 void Game_Init(ExitCallback exitFunction)
 {
     ExitFunction = exitFunction;
@@ -91,7 +99,9 @@ void Game_Init(ExitCallback exitFunction)
     Audio_Init();
 
     // TODO: do in background, else it takes forever to start etc
+    // - it's ok for FX only
     LoadAudio();
+    CreateVoices();
 
     Log("Game initalized successfully");
 }

@@ -12,5 +12,6 @@ static AudioMaster AudioDevice = {};
 void Audio_Init();
 void Audio_Dispose();
 
-void PlayNewAudio(AudioData* audio);
 void LoadOggAsPcm(AudioData& audio, const string filePath);
+void CreateVoiceForAudio(AudioData* audio, VoiceSettings& settings);
+void PlayAudioNow(AudioData* audio, PlaybackSettings playback);

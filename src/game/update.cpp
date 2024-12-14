@@ -5,12 +5,15 @@
 void ResetLevel(string levelName)
 {
     // TODO: play reset sound
+    // stop all current audio
     CurrentMap = LoadMap(levelName);
     v2 doorPos = PositionOf(DOOR);
 
     // TODO: not flexible, if the door is on the sides
     v2 playerStart = doorPos + v2{0, -1};
-    Player = {playerStart};
+    Player.position = playerStart;
+    Player.in_animation = false;
+    Player.time_since_anim_start = 0;
 
     Logf("Reset level %s", levelName.c_str());
 }

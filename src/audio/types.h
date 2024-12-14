@@ -1,4 +1,5 @@
 #include "imports.h"
+#include <xaudio2.h>
 
 struct AudioMaster
 {
@@ -8,7 +9,7 @@ struct AudioMaster
 
     IXAudio2* audio_device;
     IXAudio2MasteringVoice* master;
-    IXAudio2SubmixVoice* verb_mix;
+    IXAudio2SubmixVoice* effect_mix;
 
     bool initalized;
     HRESULT error_code;
@@ -34,4 +35,23 @@ struct AudioData
     float length_in_s;
 
     bool initalized;
+};
+
+struct VoiceSettings
+{
+    IXAudio2SourceVoice* voice;
+    WAVEFORMATEX voice_wfx;
+
+    bool initalized;
+    HRESULT error_code;
+    string error_msg = "-";
+};
+
+struct PlaybackSettings
+{
+    VoiceSettings* settings;
+
+    float volume = 1.;
+    float pan = 0.;
+    float lowpass_filter = 1;
 };

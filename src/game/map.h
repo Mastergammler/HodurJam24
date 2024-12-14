@@ -3,6 +3,11 @@
 
 #include "internal.h"
 
+#define NAMEOF(x) #x
+
+static const char DELIMITER = ':';
+static const string INPUT_CONF = "configs/keyboard.conf";
+
 static unordered_map<string, TileType> FX_MAPPING = {
                                         {"footstep-stone", STONE},
                                         {"footstep-carpet", CARPET},
