@@ -16,7 +16,9 @@ static unordered_map<string, TileType> FX_MAPPING = {
                                         {"footstep-carpet", CARPET},
                                         {"footstep-wood-hi", WOOD},
                                         {"wall-bump", WALL},
-                                        {"chest-bump", CHEST}};
+                                        {"chest-bump", CHEST},
+                                        {"door-bump", DOOR},
+                                        {"pillar-bump", PILLAR}};
 
 static unordered_map<string, TileType> INTERACTION_MAPPING = {
                                         {"open-chest", CHEST}};
