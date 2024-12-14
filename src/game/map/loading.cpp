@@ -30,6 +30,16 @@ bool IsWalkable(TileType type)
     }
 }
 
+bool IsInteractable(TileType type)
+{
+    switch (type)
+    {
+        case DOOR:
+        case CHEST: return true;
+        default: return false;
+    }
+}
+
 // TODO: I can impove this to be way more flexible
 //  - i don't need to do the akward column check
 //  - i have it in a way, where every element is only 1 char,
@@ -89,6 +99,7 @@ Map LoadMap(string name)
             currentTile->type = ParseTileType(columnData[i]);
             currentTile->position = {curCol, curRow};
             currentTile->is_walkable = IsWalkable(currentTile->type);
+            currentTile->is_interactable = IsInteractable(currentTile->type);
         }
 
         float time = Measure_Elapsed(fileClock);

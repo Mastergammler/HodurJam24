@@ -116,6 +116,47 @@ void HandleAnimation()
     }
 }
 
+void HandleActions()
+{
+    if (GameInputs.Action.pressed)
+    {
+        v2 lookPosition = Player.position + Player.orientation;
+        Tile forwardTile = TileAt(lookPosition);
+
+        // TODO: actually i need to check the objects state
+        //  -> becaues it's something specific most of the time
+        if (forwardTile.is_interactable)
+        {
+            // TODO: this is almost 100% the logic of the other one, instead
+            // which mapping to use
+            //-> i need to unify those!!!
+            if (Audio.interaction_mapping.find(forwardTile.type) !=
+                Audio.interaction_mapping.end())
+            {
+                FxInfo fxInfo = Audio.interaction_mapping[forwardTile.type];
+                AudioData* audio = &Audio.Fx[fxInfo.start_idx];
+
+                PlaybackSettings playback = {};
+                playback.settings = &Player.body;
+
+                if (Player.orientation == v2{-1, 0})
+                {
+                    playback.pan = -.65;
+                }
+                else if (Player.orientation == v2{1, 0})
+                {
+                    playback.pan = .65;
+                }
+                else if (Player.orientation == v2{0, 1})
+                {
+                    playback.lowpass_filter = 0.45;
+                }
+                PlayAudioNow(audio, playback);
+            }
+        }
+    }
+}
+
 void HandleMovement()
 {
     v2 direction = GetMovementDirection();
@@ -143,6 +184,7 @@ void HandleMovement()
     }
     else
     {
+        Player.orientation = direction;
         PlayTileAudio(nextTile.type, direction);
     }
 }

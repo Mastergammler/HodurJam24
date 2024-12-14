@@ -106,4 +106,5 @@ struct LoadedAudio
     int fx_count;
 
     unordered_map<TileType, FxInfo> fx_mapping;
+    unordered_map<TileType, FxInfo> interaction_mapping;
 };

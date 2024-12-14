@@ -2,6 +2,9 @@
 #pragma once
 
 #include "internal.h"
+#include "types.h"
+#include <string>
+#include <unordered_map>
 
 #define NAMEOF(x) #x
 
@@ -14,6 +17,9 @@ static unordered_map<string, TileType> FX_MAPPING = {
                                         {"footstep-wood-hi", WOOD},
                                         {"wall-bump", WALL},
                                         {"chest-bump", CHEST}};
+
+static unordered_map<string, TileType> INTERACTION_MAPPING = {
+                                        {"open-chest", CHEST}};
 
 Map LoadMap(string name);
 Tile TileAt(v2 pos);

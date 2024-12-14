@@ -26,4 +26,5 @@ void Game_Update()
     if (GameInputs.F3.released) ResetLevel("test03");
 
     HandleMovement();
+    HandleActions();
 }

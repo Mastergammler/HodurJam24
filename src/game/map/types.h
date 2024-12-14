@@ -6,6 +6,7 @@ struct Tile
     TileType type;
     v2 position;
     bool is_walkable;
+    bool is_interactable;
 };
 
 inline ostream& operator<<(ostream& os, const Tile& obj)
@@ -34,5 +35,3 @@ struct Map
     int columns;
     int total_tiles;
 };
-
-

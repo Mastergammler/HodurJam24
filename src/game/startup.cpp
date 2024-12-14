@@ -70,6 +70,21 @@ void LoadAudio()
             }
         }
 
+        // intercactions are always only one (for now)
+        for (const auto& pair : INTERACTION_MAPPING)
+        {
+            if (starts_with(files[i].file_name, pair.first))
+            {
+                FxInfo interactionInfo = {};
+                interactionInfo.type = pair.second;
+                interactionInfo.start_idx = i;
+                interactionInfo.count = 1;
+
+                Audio.interaction_mapping.insert({pair.second,
+                                                  interactionInfo});
+            }
+        }
+
         // TODO: very ugly logic
         if (i == Audio.fx_count - 1)
         {
