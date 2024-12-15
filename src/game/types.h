@@ -102,6 +102,9 @@ struct LoadedAudio
 {
     AudioData DangerSound;
     AudioData SuccessSound;
+    AudioData LockIn;
+    AudioData ObtainKeys;
+    AudioData UnlockDoor;
 
     AudioData* Fx;
     int fx_count;

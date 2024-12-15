@@ -3,8 +3,6 @@
 
 #include "internal.h"
 #include "types.h"
-#include <string>
-#include <unordered_map>
 
 #define NAMEOF(x) #x
 
@@ -20,8 +18,11 @@ static unordered_map<string, TileType> FX_MAPPING = {
                                         {"door-bump", DOOR},
                                         {"pillar-bump", PILLAR}};
 
+// TODO: does this make sense?
+// - for the nope sound & the rest this is kind of wired
 static unordered_map<string, TileType> INTERACTION_MAPPING = {
-                                        {"open-chest", CHEST}};
+                                        {"open-chest", CHEST},
+};
 
 Map LoadMap(string name);
 Tile TileAt(v2 pos);

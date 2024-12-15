@@ -213,7 +213,7 @@ void ApplyLowpass(VoiceSettings* settings, float lowpassValue)
     }
 }
 
-void PlayAudioNow(AudioData* audio, PlaybackSettings playback)
+void PlayAudio(AudioData* audio, PlaybackSettings playback, bool clearQueue)
 {
     if (!ValidatePlayback(audio, playback.settings)) return;
 
@@ -223,11 +223,15 @@ void PlayAudioNow(AudioData* audio, PlaybackSettings playback)
 
     IXAudio2SourceVoice* voice = playback.settings->voice;
 
-    HRESULT hr = voice->Stop();
-    if (FAILED(hr)) Log("Error stoping currently playing audio!");
+    HRESULT hr;
+    if (clearQueue)
+    {
+        hr = voice->Stop();
+        if (FAILED(hr)) Log("Error stoping currently playing audio!");
 
-    hr = voice->FlushSourceBuffers();
-    if (FAILED(hr)) Log("Error flushing source buffers!");
+        hr = voice->FlushSourceBuffers();
+        if (FAILED(hr)) Log("Error flushing source buffers!");
+    }
 
     hr = voice->SubmitSourceBuffer(&audioBuffer);
     if (FAILED(hr))

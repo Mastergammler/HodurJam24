@@ -14,4 +14,6 @@ void Audio_Dispose();
 
 void LoadOggAsPcm(AudioData& audio, const string filePath);
 void CreateVoiceForAudio(AudioData* audio, VoiceSettings& settings);
-void PlayAudioNow(AudioData* audio, PlaybackSettings playback);
+void PlayAudio(AudioData* audio,
+               PlaybackSettings playback,
+               bool clearQueue = true);

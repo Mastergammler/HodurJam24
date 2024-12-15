@@ -18,7 +18,8 @@ void LoadLevel(string levelName)
     Player.in_animation = false;
     Player.time_since_anim_start = 0;
 
-    PlayAudioNow(&Audio.DangerSound, {&GlobalVoice});
+    PlayAudio(&Audio.DangerSound, {&GlobalVoice}, true);
+    PlayAudio(&Audio.LockIn, {&GlobalVoice}, false);
     Logf("Reset level %s", levelName.c_str());
 }
 

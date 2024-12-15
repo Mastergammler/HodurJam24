@@ -64,7 +64,7 @@ void PlayTileAudio(TileType type, bool isFirst, v2 direction)
             playback.lowpass_filter = STEP_BACK_LP_CO;
         }
 
-        PlayAudioNow(audio, playback);
+        PlayAudio(audio, playback);
     }
 }
 
@@ -91,7 +91,7 @@ void PlayTileAudio(TileType type, v2 direction)
         {
             playback.lowpass_filter = BACK_LP_CO;
         }
-        PlayAudioNow(audio, playback);
+        PlayAudio(audio, playback);
     }
 }
 
@@ -113,19 +113,65 @@ void HandleAnimation()
     }
 }
 
+void PlayPositionalAudio(unordered_map<TileType, FxInfo> mapping,
+                         TileType tileType)
+{
+    if (mapping.find(tileType) != mapping.end())
+    {
+        FxInfo fxInfo = Audio.interaction_mapping[tileType];
+        AudioData* audio = &Audio.Fx[fxInfo.start_idx];
+
+        PlaybackSettings playback = {&Player.body};
+
+        if (Player.orientation == WEST)
+        {
+            playback.pan = -BUMP_PAN;
+        }
+        else if (Player.orientation == EAST)
+        {
+            playback.pan = BUMP_PAN;
+        }
+        else if (Player.orientation == SOUTH)
+        {
+            playback.lowpass_filter = BACK_LP_CO;
+        }
+        PlayAudio(audio, playback);
+    }
+}
+
 void ExecuteAction(TileType interactionType)
 {
     switch (interactionType)
     {
-        // TODO: disable playing opening sound again
-        case CHEST: Level.has_key = true; break;
+        case CHEST:
+        {
+            // TODO: hacky prototype solution
+            if (Level.has_key)
+            {
+                // TODO: disable playing opening sound again
+                PlayAudio(&Audio.ObtainKeys, {&GlobalVoice});
+            }
+            else
+            {
+                Level.has_key = true;
+                PlayPositionalAudio(Audio.interaction_mapping, interactionType);
+            }
+        }
+        break;
+
         case DOOR:
         {
             if (Level.has_key)
             {
-                PlayAudioNow(&Audio.SuccessSound, {&GlobalVoice});
+                PlayAudio(&Audio.UnlockDoor, {&GlobalVoice}, true);
+                PlayAudio(&Audio.SuccessSound, {&GlobalVoice}, false);
             }
-            // TODO: play alternative if not
+            else
+            {
+                // TODO: play nope sound if not?!
+                // -> or do i want to have a specific sound each?
+                // PlayAudio(AudioData *audio, PlaybackSettings playback);
+            }
         }
         break;
         default: assert("Missing enum definition!");
@@ -143,33 +189,6 @@ void HandleActions()
         //  -> becaues it's something specific most of the time
         if (forwardTile.is_interactable)
         {
-            // TODO: this is almost 100% the logic of the other one, instead
-            // which mapping to use
-            //-> i need to unify those!!!
-            if (Audio.interaction_mapping.find(forwardTile.type) !=
-                Audio.interaction_mapping.end())
-            {
-                FxInfo fxInfo = Audio.interaction_mapping[forwardTile.type];
-                AudioData* audio = &Audio.Fx[fxInfo.start_idx];
-
-                PlaybackSettings playback = {};
-                playback.settings = &Player.body;
-
-                if (Player.orientation == WEST)
-                {
-                    playback.pan = -BUMP_PAN;
-                }
-                else if (Player.orientation == EAST)
-                {
-                    playback.pan = BUMP_PAN;
-                }
-                else if (Player.orientation == SOUTH)
-                {
-                    playback.lowpass_filter = BACK_LP_CO;
-                }
-                PlayAudioNow(audio, playback);
-            }
-
             ExecuteAction(forwardTile.type);
         }
     }

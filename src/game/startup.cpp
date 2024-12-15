@@ -97,6 +97,9 @@ void LoadAudio()
 
     LoadOggAsPcm(Audio.DangerSound, "res/amb/s_level-start.ogg");
     LoadOggAsPcm(Audio.SuccessSound, "res/amb/s_level-success.ogg");
+    LoadOggAsPcm(Audio.LockIn, "res/amb/s_lock-in.ogg");
+    LoadOggAsPcm(Audio.ObtainKeys, "res/amb/s_obtain-keys.ogg");
+    LoadOggAsPcm(Audio.UnlockDoor, "res/amb/s_unlock-door.ogg");
 
     float time = Measure_Elapsed(loadAudioClock);
     Logf("|::| All audio loaded within %.2fms", time);
