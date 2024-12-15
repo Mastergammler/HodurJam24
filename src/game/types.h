@@ -88,7 +88,12 @@ enum TileType
     /**
      * 'O'
      */
-    PILLAR
+    PILLAR,
+
+    /**
+     * Workaround: Just for fx loading ...
+     */
+    NOOP
 };
 
 struct FxInfo
@@ -100,6 +105,7 @@ struct FxInfo
 
 struct LoadedAudio
 {
+    AudioData OpenChest;
     AudioData DangerSound;
     AudioData SuccessSound;
     AudioData LockIn;

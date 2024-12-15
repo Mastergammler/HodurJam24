@@ -70,21 +70,6 @@ void LoadAudio()
             }
         }
 
-        // intercactions are always only one (for now)
-        for (const auto& pair : INTERACTION_MAPPING)
-        {
-            if (starts_with(files[i].file_name, pair.first))
-            {
-                FxInfo interactionInfo = {};
-                interactionInfo.type = pair.second;
-                interactionInfo.start_idx = i;
-                interactionInfo.count = 1;
-
-                Audio.interaction_mapping.insert({pair.second,
-                                                  interactionInfo});
-            }
-        }
-
         // TODO: very ugly logic
         if (i == Audio.fx_count - 1)
         {
@@ -95,6 +80,7 @@ void LoadAudio()
         LoadOggAsPcm(Audio.Fx[i], files[i].path);
     }
 
+    LoadOggAsPcm(Audio.OpenChest, "res/amb/s_open-chest.ogg");
     LoadOggAsPcm(Audio.DangerSound, "res/amb/s_level-start.ogg");
     LoadOggAsPcm(Audio.SuccessSound, "res/amb/s_level-success.ogg");
     LoadOggAsPcm(Audio.LockIn, "res/amb/s_lock-in.ogg");

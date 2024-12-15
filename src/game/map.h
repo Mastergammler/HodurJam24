@@ -16,13 +16,8 @@ static unordered_map<string, TileType> FX_MAPPING = {
                                         {"wall-bump", WALL},
                                         {"chest-bump", CHEST},
                                         {"door-bump", DOOR},
-                                        {"pillar-bump", PILLAR}};
-
-// TODO: does this make sense?
-// - for the nope sound & the rest this is kind of wired
-static unordered_map<string, TileType> INTERACTION_MAPPING = {
-                                        {"open-chest", CHEST},
-};
+                                        {"pillar-bump", PILLAR},
+                                        {"nope-sound", NOOP}};
 
 Map LoadMap(string name);
 Tile TileAt(v2 pos);

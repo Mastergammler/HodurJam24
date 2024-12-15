@@ -22,7 +22,7 @@ v2 GetMovementDirection()
     return INIT;
 }
 
-void PlayTileAudio(TileType type, bool isFirst, v2 direction)
+void PlayFootstepAudio(TileType type, bool isFirst, v2 direction)
 {
     if (Audio.fx_mapping.find(type) != Audio.fx_mapping.end())
     {
@@ -95,24 +95,6 @@ void PlayTileAudio(TileType type, v2 direction)
     }
 }
 
-// TODO: not sure if this is the best solutions it's quit of akward
-//  also if the player continues immediately after stopping then i have overlap
-//  that's not great
-void HandleAnimation()
-{
-    Player.time_since_anim_start += Timer.sim_time;
-
-    if (Player.time_since_anim_start >= STEP_ANIM_TIME)
-    {
-        Player.time_since_anim_start = 0;
-        Player.in_animation = false;
-        if (Level.current_tile.is_walkable)
-        {
-            PlayTileAudio(Level.current_tile.type, false, Player.orientation);
-        }
-    }
-}
-
 void PlayPositionalAudio(unordered_map<TileType, FxInfo> mapping,
                          TileType tileType)
 {
@@ -139,22 +121,41 @@ void PlayPositionalAudio(unordered_map<TileType, FxInfo> mapping,
     }
 }
 
+// TODO: not sure if this is the best solutions it's quit of akward
+//  also if the player continues immediately after stopping then i have overlap
+//  that's not great
+void HandleAnimation()
+{
+    Player.time_since_anim_start += Timer.sim_time;
+
+    if (Player.time_since_anim_start >= STEP_ANIM_TIME)
+    {
+        Player.time_since_anim_start = 0;
+        Player.in_animation = false;
+        if (Level.current_tile.is_walkable)
+        {
+            PlayFootstepAudio(Level.current_tile.type,
+                              false,
+                              Player.orientation);
+        }
+    }
+}
+
 void ExecuteAction(TileType interactionType)
 {
     switch (interactionType)
     {
         case CHEST:
         {
-            // TODO: hacky prototype solution
             if (Level.has_key)
             {
-                // TODO: disable playing opening sound again
-                PlayAudio(&Audio.ObtainKeys, {&GlobalVoice});
+                PlayTileAudio(NOOP, INIT);
             }
             else
             {
                 Level.has_key = true;
-                PlayPositionalAudio(Audio.interaction_mapping, interactionType);
+                PlayAudio(&Audio.OpenChest, {&GlobalVoice});
+                PlayAudio(&Audio.ObtainKeys, {&GlobalVoice}, false);
             }
         }
         break;
@@ -168,9 +169,7 @@ void ExecuteAction(TileType interactionType)
             }
             else
             {
-                // TODO: play nope sound if not?!
-                // -> or do i want to have a specific sound each?
-                // PlayAudio(AudioData *audio, PlaybackSettings playback);
+                PlayTileAudio(NOOP, INIT);
             }
         }
         break;
@@ -217,7 +216,7 @@ void HandleMovement()
         Player.in_animation = true;
         Level.current_tile = nextTile;
 
-        PlayTileAudio(nextTile.type, true, direction);
+        PlayFootstepAudio(nextTile.type, true, direction);
     }
     else
     {
