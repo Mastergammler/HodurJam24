@@ -95,6 +95,9 @@ void LoadAudio()
         LoadOggAsPcm(Audio.Fx[i], files[i].path);
     }
 
+    LoadOggAsPcm(Audio.DangerSound, "res/amb/s_level-start.ogg");
+    LoadOggAsPcm(Audio.SuccessSound, "res/amb/s_level-success.ogg");
+
     float time = Measure_Elapsed(loadAudioClock);
     Logf("|::| All audio loaded within %.2fms", time);
 }
@@ -105,6 +108,7 @@ void CreateVoices()
     CreateVoiceForAudio(&Audio.Fx[0], Player.left_foot);
     CreateVoiceForAudio(&Audio.Fx[0], Player.right_foot);
     CreateVoiceForAudio(&Audio.Fx[0], Player.body);
+    CreateVoiceForAudio(&Audio.DangerSound, GlobalVoice);
 }
 
 void Game_Init(ExitCallback exitFunction)

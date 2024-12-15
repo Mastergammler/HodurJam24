@@ -2,11 +2,14 @@
 #include "map.h"
 #include "player.h"
 
-void ResetLevel(string levelName)
+void LoadLevel(string levelName)
 {
     // TODO: play reset sound
     // stop all current audio
-    CurrentMap = LoadMap(levelName);
+
+    Level.level_name = levelName;
+    Level.has_key = false;
+    Level.map = LoadMap(levelName);
     v2 doorPos = PositionOf(DOOR);
 
     // TODO: not flexible, if the door is on the sides
@@ -15,15 +18,17 @@ void ResetLevel(string levelName)
     Player.in_animation = false;
     Player.time_since_anim_start = 0;
 
+    PlayAudioNow(&Audio.DangerSound, {&GlobalVoice});
     Logf("Reset level %s", levelName.c_str());
 }
 
 void Game_Update()
 {
     if (GameInputs.Exit.released) ExitFunction();
-    if (GameInputs.F1.released) ResetLevel("test01");
-    if (GameInputs.F2.released) ResetLevel("test02");
-    if (GameInputs.F3.released) ResetLevel("test03");
+    if (GameInputs.F1.released) LoadLevel("test01");
+    if (GameInputs.F2.released) LoadLevel("test02");
+    if (GameInputs.F3.released) LoadLevel("test03");
+    if (GameInputs.Reset.released) LoadLevel(Level.level_name);
 
     HandleMovement();
     HandleActions();

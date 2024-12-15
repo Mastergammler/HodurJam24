@@ -1,27 +1,25 @@
 #include "../internal.h"
 #include "../map.h"
 
-static Tile CurrentTile = {WALL, {-1, -1}, false};
+const v2 NORTH = {0, -1};
+const v2 WEST = {-1, 0};
+const v2 EAST = {1, 0};
+const v2 SOUTH = {0, 1};
+const v2 INIT = {0, 0};
+const float STEP_PAN = 0.2;
+const float SEC_STEP_VOL = 0.42;
+const float STEP_BACK_LP_CO = 0.35;
+const float BACK_LP_CO = 0.45;
+const float BUMP_PAN = 0.65;
+const float STEP_ANIM_TIME = .55f;
 
 v2 GetMovementDirection()
 {
-    if (GameInputs.MoveForward.pressed)
-    {
-        return {0, -1};
-    }
-    if (GameInputs.MoveBackward.pressed)
-    {
-        return {0, 1};
-    }
-    if (GameInputs.MoveLeft.pressed)
-    {
-        return {-1, 0};
-    }
-    if (GameInputs.MoveRight.pressed)
-    {
-        return {1, 0};
-    }
-    return {0, 0};
+    if (GameInputs.MoveForward.pressed) return NORTH;
+    if (GameInputs.MoveBackward.pressed) return SOUTH;
+    if (GameInputs.MoveLeft.pressed) return WEST;
+    if (GameInputs.MoveRight.pressed) return EAST;
+    return INIT;
 }
 
 void PlayTileAudio(TileType type, bool isFirst, v2 direction)
@@ -34,37 +32,36 @@ void PlayTileAudio(TileType type, bool isFirst, v2 direction)
 
         PlaybackSettings playback = {};
 
-        // TODO: backwards flip also?
-        // -> also pretty ugly
-        if (isFirst && direction == v2{-1, 0})
+        // TODO: also pretty ugly
+        if (isFirst && direction == NORTH)
         {
-            playback.pan = -0.20;
+            playback.pan = -STEP_PAN;
             playback.settings = &Player.left_foot;
         }
-        else if (isFirst && direction == v2{1, 0} ||
-                 isFirst && direction == v2{0, 1})
+        else if ((isFirst && direction == EAST) ||
+                 (isFirst && direction == SOUTH))
         {
             playback.settings = &Player.right_foot;
-            playback.pan = 0.20;
+            playback.pan = STEP_PAN;
         }
         else if (isFirst)
         {
-            playback.pan = -0.20;
+            playback.pan = -STEP_PAN;
             playback.settings = &Player.left_foot;
         }
         else
         {
             playback.settings = &Player.right_foot;
-            playback.pan = 0.20;
+            playback.pan = STEP_PAN;
         }
 
         if (!isFirst)
         {
-            playback.volume = 0.42;
+            playback.volume = SEC_STEP_VOL;
         }
-        if (direction == v2{0, 1})
+        if (direction == SOUTH)
         {
-            playback.lowpass_filter = 0.35;
+            playback.lowpass_filter = STEP_BACK_LP_CO;
         }
 
         PlayAudioNow(audio, playback);
@@ -82,17 +79,17 @@ void PlayTileAudio(TileType type, v2 direction)
         PlaybackSettings playback = {};
         playback.settings = &Player.body;
 
-        if (direction == v2{-1, 0})
+        if (direction == WEST)
         {
-            playback.pan = -.65;
+            playback.pan = -BUMP_PAN;
         }
-        else if (direction == v2{1, 0})
+        else if (direction == EAST)
         {
-            playback.pan = .65;
+            playback.pan = BUMP_PAN;
         }
-        else if (direction == v2{0, 1})
+        else if (direction == SOUTH)
         {
-            playback.lowpass_filter = 0.45;
+            playback.lowpass_filter = BACK_LP_CO;
         }
         PlayAudioNow(audio, playback);
     }
@@ -109,10 +106,29 @@ void HandleAnimation()
     {
         Player.time_since_anim_start = 0;
         Player.in_animation = false;
-        if (CurrentTile.is_walkable)
+        if (Level.current_tile.is_walkable)
         {
-            PlayTileAudio(CurrentTile.type, false, Player.orientation);
+            PlayTileAudio(Level.current_tile.type, false, Player.orientation);
         }
+    }
+}
+
+void ExecuteAction(TileType interactionType)
+{
+    switch (interactionType)
+    {
+        // TODO: disable playing opening sound again
+        case CHEST: Level.has_key = true; break;
+        case DOOR:
+        {
+            if (Level.has_key)
+            {
+                PlayAudioNow(&Audio.SuccessSound, {&GlobalVoice});
+            }
+            // TODO: play alternative if not
+        }
+        break;
+        default: assert("Missing enum definition!");
     }
 }
 
@@ -139,20 +155,22 @@ void HandleActions()
                 PlaybackSettings playback = {};
                 playback.settings = &Player.body;
 
-                if (Player.orientation == v2{-1, 0})
+                if (Player.orientation == WEST)
                 {
-                    playback.pan = -.65;
+                    playback.pan = -BUMP_PAN;
                 }
-                else if (Player.orientation == v2{1, 0})
+                else if (Player.orientation == EAST)
                 {
-                    playback.pan = .65;
+                    playback.pan = BUMP_PAN;
                 }
-                else if (Player.orientation == v2{0, 1})
+                else if (Player.orientation == SOUTH)
                 {
-                    playback.lowpass_filter = 0.45;
+                    playback.lowpass_filter = BACK_LP_CO;
                 }
                 PlayAudioNow(audio, playback);
             }
+
+            ExecuteAction(forwardTile.type);
         }
     }
 }
@@ -168,7 +186,7 @@ void HandleMovement()
         return;
     }
 
-    if (direction == v2{0, 0}) return;
+    if (direction == INIT) return;
 
     v2 nextPosition = Player.position + direction;
     Tile nextTile = TileAt(nextPosition);
@@ -178,7 +196,7 @@ void HandleMovement()
         Player.orientation = direction;
         Player.position = nextPosition;
         Player.in_animation = true;
-        CurrentTile = nextTile;
+        Level.current_tile = nextTile;
 
         PlayTileAudio(nextTile.type, true, direction);
     }

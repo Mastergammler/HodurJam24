@@ -100,7 +100,8 @@ struct FxInfo
 
 struct LoadedAudio
 {
-    AudioData TestAudio;
+    AudioData DangerSound;
+    AudioData SuccessSound;
 
     AudioData* Fx;
     int fx_count;

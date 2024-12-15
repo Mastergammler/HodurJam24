@@ -35,3 +35,12 @@ struct Map
     int columns;
     int total_tiles;
 };
+
+struct LevelState
+{
+    string level_name;
+    bool has_key;
+
+    Map map = {0, 0};
+    Tile current_tile = {WALL, {-1, -1}, false};
+};

@@ -4,11 +4,15 @@
 
 #include "map/types.h"
 #include "player/types.h"
-
-static const float STEP_ANIM_TIME = .55f;
+#include "types.h"
 
 static ExitCallback ExitFunction;
 static HodurInputState GameInputs = {18, new KeyInput[18]};
 static LoadedAudio Audio;
-static Map CurrentMap = {0, 0};
 static Player Player;
+static LevelState Level;
+
+/**
+ * Stereo voice playback for non directional things
+ */
+static VoiceSettings GlobalVoice;

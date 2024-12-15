@@ -1,7 +1,4 @@
 #include "module.h"
-#include <winerror.h>
-#include <winnt.h>
-#include <xaudio2.h>
 
 /**
  * Ogg Vorbis alsways uses 16 bits per sample
@@ -122,6 +119,13 @@ bool ValidatePlayback(AudioData* audio, VoiceSettings* settings)
 {
     if (!ValidateAudio(audio)) return false;
 
+    if (settings == NULL)
+    {
+        Logf("Voice settings are NULL. Aborting playback. (%s)",
+             audio->file_name.c_str());
+        return false;
+    }
+
     if (!settings->initalized)
     {
         Logf("Voice is not initalized: %s", settings->error_msg.c_str());
@@ -193,7 +197,7 @@ void ApplyLowpass(VoiceSettings* settings, float lowpassValue)
 {
     XAUDIO2_FILTER_PARAMETERS filterParams;
     filterParams.Type = LowPassFilter;
-    // cutoff frequency from 0 - 1
+    // cutoff frequency coefficient from 0 - 1
     filterParams.Frequency = lowpassValue;
     // steepness / shelf?
     filterParams.OneOverQ = 1;
