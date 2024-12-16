@@ -93,7 +93,12 @@ enum TileType
     /**
      * Workaround: Just for fx loading ...
      */
-    NOOP
+    NOOP,
+
+    /**
+     * Workaround 2 for next thingy
+     */
+    HUH,
 };
 
 struct FxInfo
@@ -111,6 +116,11 @@ struct LoadedAudio
     AudioData LockIn;
     AudioData ObtainKeys;
     AudioData UnlockDoor;
+
+    AudioData UiDown;
+    AudioData UiUp;
+    AudioData UiRight;
+    AudioData UiLeft;
 
     AudioData* fx;
     int fx_count;

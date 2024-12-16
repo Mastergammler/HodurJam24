@@ -50,11 +50,14 @@ void LoadUiSounds()
 
     for (int i = 0; i < Audio.ui_count; i++)
     {
-        // FIXME: this will crash if others except numbers are used
         string name = files[i].file_name;
-        remove_until(name, '-');
-        int num = stoi(name);
-        Audio.num_mapping.insert({num, i});
+        if (starts_with(name, "num"))
+        {
+            // TODO: makes this sense now with the new approach?
+            remove_until(name, '-');
+            int num = stoi(name);
+            Audio.num_mapping.insert({num, i});
+        }
 
         // TODO: map to number
         LoadOggAsPcm(Audio.ui[i], files[i].path);
@@ -69,4 +72,10 @@ void LoadStaticAudio()
     LoadOggAsPcm(Audio.LockIn, "res/amb/s_lock-in.ogg");
     LoadOggAsPcm(Audio.ObtainKeys, "res/amb/s_obtain-keys.ogg");
     LoadOggAsPcm(Audio.UnlockDoor, "res/amb/s_unlock-door.ogg");
+
+    // TODO: handle this via mapping is better?
+    LoadOggAsPcm(Audio.UiDown, "res/ui/s_whoosh-001.ogg");
+    LoadOggAsPcm(Audio.UiUp, "res/ui/s_whoosh-002.ogg");
+    LoadOggAsPcm(Audio.UiRight, "res/ui/s_whoosh-003.ogg");
+    LoadOggAsPcm(Audio.UiLeft, "res/ui/s_whoosh-004.ogg");
 }

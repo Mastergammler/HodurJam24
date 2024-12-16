@@ -17,7 +17,12 @@ static unordered_map<string, TileType> FX_MAPPING = {
                                         {"chest-bump", CHEST},
                                         {"door-bump", DOOR},
                                         {"pillar-bump", PILLAR},
-                                        {"nope-sound", NOOP}};
+                                        // TODO: I keep adding things that are
+                                        // not actually tiles
+                                        //  -> I have to find another solution
+                                        {"nope-sound", NOOP},
+                                        {"huh", HUH},
+};
 
 Map LoadMap(string name);
 Tile TileAt(v2 pos);

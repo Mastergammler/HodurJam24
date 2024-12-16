@@ -123,7 +123,7 @@ void ExecuteAction(TileType interactionType)
         {
             if (Level.has_key)
             {
-                PlayTileAudio(NOOP, INIT);
+                PlayTileAudio(HUH, INIT);
             }
             else
             {
@@ -143,7 +143,7 @@ void ExecuteAction(TileType interactionType)
             }
             else
             {
-                PlayTileAudio(NOOP, INIT);
+                PlayTileAudio(HUH, INIT);
             }
         }
         break;

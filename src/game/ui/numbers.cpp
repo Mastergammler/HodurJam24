@@ -15,10 +15,10 @@ void PlayNumberSound(int number)
     }
 
     if (fifths != 0)
-    { // TODO: i named the sounds after the actual number
+    { // TODO: it's numerated, singles are 1-4 and 5ths are 5-7
         //-> so this is a bit confusing
         //=> If i scale this beyound 20 this should probably change
-        int uiIdxFifths = Audio.num_mapping[5 * fifths];
+        int uiIdxFifths = Audio.num_mapping[fifths + 4];
         PlayAudio(&Audio.ui[uiIdxFifths], {&GlobalMono}, false);
     }
 }

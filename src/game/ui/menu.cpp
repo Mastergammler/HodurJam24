@@ -31,6 +31,18 @@ void HandleInputs()
     else
     {
         Ui.current_level += offset;
+        // TODO: play whoosh via index or smth
+        // -> this is super akward
+        if (GameInputs.MoveLeft.pressed)
+            PlayAudio(&Audio.UiLeft, {&GlobalStereo});
+        if (GameInputs.MoveRight.pressed)
+            PlayAudio(&Audio.UiRight, {&GlobalStereo});
+        if (GameInputs.MoveForward.pressed)
+            PlayAudio(&Audio.UiUp, {&GlobalStereo});
+        if (GameInputs.MoveBackward.pressed)
+            PlayAudio(&Audio.UiDown, {&GlobalStereo});
+
+        // TODO: play with delay
         PlayNumberSound(Ui.current_level);
     }
 }
