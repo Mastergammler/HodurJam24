@@ -1,4 +1,5 @@
 #include "extern/minivorbis.h"
+#include <cassert>
 #include <string>
 #include <vector>
 

@@ -129,7 +129,7 @@ void ExecuteAction(TileType interactionType)
             {
                 Level.has_key = true;
                 PlayAudio(&Audio.OpenChest, {&GlobalStereo});
-                PlayAudio(&Audio.ObtainKeys, {&GlobalStereo}, false);
+                PlayAudio(&Audio.ObtainKeys, {&GlobalStereo, false});
             }
         }
         break;
@@ -138,8 +138,12 @@ void ExecuteAction(TileType interactionType)
         {
             if (Level.has_key)
             {
-                PlayAudio(&Audio.UnlockDoor, {&GlobalStereo}, true);
-                PlayAudio(&Audio.SuccessSound, {&GlobalStereo}, false);
+                // TODO: trigger change to next level
+                //  - with delay (lock controls etc?)
+                //  - wouldn't it be cool, if you now could walk through that
+                //  door? DUnno too much effort rn
+                PlayAudio(&Audio.UnlockDoor, {&GlobalStereo});
+                PlayAudio(&Audio.SuccessSound, {&GlobalStereo, false});
             }
             else
             {

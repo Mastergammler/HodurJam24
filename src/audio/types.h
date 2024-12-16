@@ -51,7 +51,31 @@ struct PlaybackSettings
 {
     VoiceSettings* settings;
 
+    /*
+     * Usually we want to play the sound without letting the previous one finish
+     */
+    bool interrupt_previous = true;
+
     float volume = 1.;
     float pan = 0.;
     float lowpass_filter = 1;
+};
+
+struct QueueItem
+{
+    AudioData* audio;
+    PlaybackSettings settings;
+    bool pending;
+
+    /**
+     * Time to wait in s
+     */
+    float remaining_wait_time;
+};
+
+struct DelayedPlaybackQueue
+{
+    QueueItem* items;
+    int size;
+    int pending_count;
 };

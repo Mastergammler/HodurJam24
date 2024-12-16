@@ -1,6 +1,6 @@
 #include "../internal.h"
 
-void PlayNumberSound(int number)
+void PlayNumberSound(int number, float delay)
 {
     // sound only go to 19
     assert(number < 20);
@@ -8,10 +8,15 @@ void PlayNumberSound(int number)
     int fifths = number / 5;
     int rest = number % 5;
 
+    bool interrupt = true;
     if (rest != 0)
     {
         int uiIdxSingles = Audio.num_mapping[rest];
-        PlayAudio(&Audio.ui[uiIdxSingles], {&GlobalMono}, false);
+        SchedulePlayback(&Audio.ui[uiIdxSingles],
+                         {&GlobalMono, interrupt},
+                         delay);
+        // we just scheduled the first part of playback
+        interrupt = false;
     }
 
     if (fifths != 0)
@@ -19,6 +24,8 @@ void PlayNumberSound(int number)
         //-> so this is a bit confusing
         //=> If i scale this beyound 20 this should probably change
         int uiIdxFifths = Audio.num_mapping[fifths + 4];
-        PlayAudio(&Audio.ui[uiIdxFifths], {&GlobalMono}, false);
+        SchedulePlayback(&Audio.ui[uiIdxFifths],
+                         {&GlobalMono, interrupt},
+                         delay);
     }
 }

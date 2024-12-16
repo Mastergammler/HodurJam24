@@ -85,7 +85,7 @@ Map LoadMap(string name)
         }
     }
 
-    if (validMap)
+    if (validMap && lines.size() > 0)
     {
         Map map = {colCount, (int)lines.size()};
 

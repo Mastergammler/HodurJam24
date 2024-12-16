@@ -1,6 +1,10 @@
+/**
+ * WIN specific api - depends on XAudio2_9
+ * WIN 8+
+ */
 #include "module.h"
 
-void Audio_Init()
+void XAudio_Init()
 {
     HRESULT hr;
 
@@ -78,9 +82,9 @@ void Audio_Init()
     AudioDevice.initalized = true;
 }
 
-void Audio_Dispose()
+void XAudio_Dispose()
 {
-    // TODO: release reverb effects etc
+    // TODO: release reverb effects and other voices etc
     if (AudioDevice.effect_mix) AudioDevice.effect_mix->DestroyVoice();
     if (AudioDevice.master) AudioDevice.master->DestroyVoice();
     if (AudioDevice.audio_device) AudioDevice.audio_device->Release();

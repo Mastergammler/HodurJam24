@@ -1,3 +1,4 @@
+// TODO: separate win specific from other code
 #include "module.h"
 
 /**
@@ -213,7 +214,7 @@ void ApplyLowpass(VoiceSettings* settings, float lowpassValue)
     }
 }
 
-void PlayAudio(AudioData* audio, PlaybackSettings playback, bool clearQueue)
+void PlayAudio(AudioData* audio, PlaybackSettings playback)
 {
     if (!ValidatePlayback(audio, playback.settings)) return;
 
@@ -224,7 +225,7 @@ void PlayAudio(AudioData* audio, PlaybackSettings playback, bool clearQueue)
     IXAudio2SourceVoice* voice = playback.settings->voice;
 
     HRESULT hr;
-    if (clearQueue)
+    if (playback.interrupt_previous)
     {
         hr = voice->Stop();
         if (FAILED(hr)) Log("Error stoping currently playing audio!");

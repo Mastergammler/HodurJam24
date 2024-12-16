@@ -11,9 +11,12 @@ static AudioMaster AudioDevice = {};
 
 void Audio_Init();
 void Audio_Dispose();
+void Audio_Update(float deltaTimeS);
 
 void LoadOggAsPcm(AudioData& audio, const string filePath);
 void CreateVoiceForAudio(AudioData* audio, VoiceSettings& settings);
-void PlayAudio(AudioData* audio,
-               PlaybackSettings playback,
-               bool clearQueue = true);
+void PlayAudio(AudioData* audio, PlaybackSettings playback);
+void SchedulePlayback(AudioData* audio,
+                      PlaybackSettings settings,
+                      float delayInS);
+void AudioQueue_ClearSchedule();

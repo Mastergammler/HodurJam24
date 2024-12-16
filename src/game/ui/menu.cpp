@@ -30,6 +30,7 @@ void HandleInputs()
     }
     else
     {
+
         Ui.current_level += offset;
         // TODO: play whoosh via index or smth
         // -> this is super akward
@@ -42,7 +43,8 @@ void HandleInputs()
         if (GameInputs.MoveBackward.pressed)
             PlayAudio(&Audio.UiDown, {&GlobalStereo});
 
-        // TODO: play with delay
-        PlayNumberSound(Ui.current_level);
+        // only play the most recent one
+        AudioQueue_ClearSchedule();
+        PlayNumberSound(Ui.current_level, BEFORE_NUM);
     }
 }

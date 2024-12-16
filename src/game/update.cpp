@@ -5,6 +5,8 @@
 
 void Game_Update()
 {
+    Audio_Update(Timer.sim_time);
+
     if (Ui.is_active)
     {
         if (GameInputs.Action.released) LoadLevel(Ui.current_level);

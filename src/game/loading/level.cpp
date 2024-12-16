@@ -22,9 +22,8 @@ void LoadLevel(int level)
     Player.in_animation = false;
     Player.time_since_anim_start = 0;
 
-    // TODO: i would like to play it with delay . (delay .. delay ...)
-    PlayNumberSound(level);
-    PlayAudio(&Audio.DangerSound, {&GlobalStereo}, true);
-    PlayAudio(&Audio.LockIn, {&GlobalStereo}, false);
+    PlayNumberSound(level, 2);
+    PlayAudio(&Audio.DangerSound, {&GlobalStereo});
+    PlayAudio(&Audio.LockIn, {&GlobalStereo, false});
     Logf("Loading level %s", levelName.c_str());
 }
