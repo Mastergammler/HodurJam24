@@ -1,4 +1,5 @@
 #include "internal.h"
+#include "loading.h"
 #include "map.h"
 #include "utils/parsing.cpp"
 
@@ -37,67 +38,30 @@ void InitInputs()
     Input_Init(&GameInputs, keyMappings);
 }
 
+void CreateVoices()
+{
+    // TODO: better choosing of the fx
+    CreateVoiceForAudio(&Audio.fx[0], Player.left_foot);
+    CreateVoiceForAudio(&Audio.fx[0], Player.right_foot);
+    CreateVoiceForAudio(&Audio.fx[0], Player.body);
+    CreateVoiceForAudio(&Audio.DangerSound, GlobalStereo);
+    CreateVoiceForAudio(&Audio.ui[0], GlobalMono);
+}
+
+// PERF: load most of it in the bg else loading might be quite long
 void LoadAudio()
 {
     Clock loadAudioClock = {};
     Measure_Start(loadAudioClock);
 
-    vector<FileEntry> files = directory_files("res/fx");
-
-    Audio.fx_count = files.size();
-    Audio.Fx = new AudioData[Audio.fx_count]();
-
-    FxInfo lastInfo = {};
-    for (int i = 0; i < Audio.fx_count; i++)
-    {
-        for (const auto& pair : FX_MAPPING)
-        {
-            if (starts_with(files[i].file_name, pair.first))
-            {
-                if (lastInfo.type != pair.second)
-                {
-                    if (i > 0)
-                    {
-                        Audio.fx_mapping.insert({lastInfo.type, lastInfo});
-                        lastInfo = {};
-                    }
-                    lastInfo.start_idx = i;
-                    lastInfo.type = pair.second;
-                }
-
-                lastInfo.count++;
-                break;
-            }
-        }
-
-        // TODO: very ugly logic
-        if (i == Audio.fx_count - 1)
-        {
-            // insert the last one
-            Audio.fx_mapping.insert({lastInfo.type, lastInfo});
-        }
-
-        LoadOggAsPcm(Audio.Fx[i], files[i].path);
-    }
-
-    LoadOggAsPcm(Audio.OpenChest, "res/amb/s_open-chest.ogg");
-    LoadOggAsPcm(Audio.DangerSound, "res/amb/s_level-start.ogg");
-    LoadOggAsPcm(Audio.SuccessSound, "res/amb/s_level-success.ogg");
-    LoadOggAsPcm(Audio.LockIn, "res/amb/s_lock-in.ogg");
-    LoadOggAsPcm(Audio.ObtainKeys, "res/amb/s_obtain-keys.ogg");
-    LoadOggAsPcm(Audio.UnlockDoor, "res/amb/s_unlock-door.ogg");
+    LoadFx();
+    LoadUiSounds();
+    LoadStaticAudio();
 
     float time = Measure_Elapsed(loadAudioClock);
-    Logf("|::| All audio loaded within %.2fms", time);
-}
+    Logf("||: All audio loaded within %.2fms :||", time);
 
-void CreateVoices()
-{
-    // TODO: better choosing of the fx
-    CreateVoiceForAudio(&Audio.Fx[0], Player.left_foot);
-    CreateVoiceForAudio(&Audio.Fx[0], Player.right_foot);
-    CreateVoiceForAudio(&Audio.Fx[0], Player.body);
-    CreateVoiceForAudio(&Audio.DangerSound, GlobalVoice);
+    CreateVoices();
 }
 
 void Game_Init(ExitCallback exitFunction)
@@ -105,11 +69,11 @@ void Game_Init(ExitCallback exitFunction)
     ExitFunction = exitFunction;
     InitInputs();
     Audio_Init();
-
-    // TODO: do in background, else it takes forever to start etc
-    // - it's ok for FX only
     LoadAudio();
-    CreateVoices();
+
+    // TEST: testing
+    Ui.current_level = 1;
+    Ui.level_count = 19;
 
     Log("Game initalized successfully");
 }

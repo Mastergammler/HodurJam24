@@ -112,9 +112,11 @@ struct LoadedAudio
     AudioData ObtainKeys;
     AudioData UnlockDoor;
 
-    AudioData* Fx;
+    AudioData* fx;
     int fx_count;
-
     unordered_map<TileType, FxInfo> fx_mapping;
-    unordered_map<TileType, FxInfo> interaction_mapping;
+
+    AudioData* ui;
+    int ui_count;
+    unordered_map<int, int> num_mapping;
 };

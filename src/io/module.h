@@ -23,3 +23,5 @@ vector<string> read_all_lines(const string filePath);
 bool starts_with(const string& input,
                  const string& startSequence,
                  bool caseSensitive = false);
+
+void remove_until(string& input, char c, bool last = true);

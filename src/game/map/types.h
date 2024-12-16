@@ -1,4 +1,3 @@
-#include "../imports.h"
 #include "../types.h"
 
 struct Tile
@@ -38,6 +37,7 @@ struct Map
 
 struct LevelState
 {
+    int number;
     string level_name;
     bool has_key;
 

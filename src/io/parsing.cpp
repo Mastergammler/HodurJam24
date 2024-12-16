@@ -91,7 +91,7 @@ void trim_start(string& input, const string& sequence)
     }
 }
 
-void remove_until(string& input, char c, bool last = true)
+void remove_until(string& input, char c, bool last)
 {
     int idx;
     if (last)

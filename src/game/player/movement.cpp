@@ -28,7 +28,7 @@ void PlayFootstepAudio(TileType type, bool isFirst, v2 direction)
     {
         FxInfo fxInfo = Audio.fx_mapping[type];
         int idxOffset = rand() % fxInfo.count;
-        AudioData* audio = &Audio.Fx[fxInfo.start_idx + idxOffset];
+        AudioData* audio = &Audio.fx[fxInfo.start_idx + idxOffset];
 
         PlaybackSettings playback = {};
 
@@ -74,7 +74,7 @@ void PlayTileAudio(TileType type, v2 direction)
     {
         FxInfo fxInfo = Audio.fx_mapping[type];
         int idxOffset = rand() % fxInfo.count;
-        AudioData* audio = &Audio.Fx[fxInfo.start_idx + idxOffset];
+        AudioData* audio = &Audio.fx[fxInfo.start_idx + idxOffset];
 
         PlaybackSettings playback = {};
         playback.settings = &Player.body;
@@ -88,32 +88,6 @@ void PlayTileAudio(TileType type, v2 direction)
             playback.pan = BUMP_PAN;
         }
         else if (direction == SOUTH)
-        {
-            playback.lowpass_filter = BACK_LP_CO;
-        }
-        PlayAudio(audio, playback);
-    }
-}
-
-void PlayPositionalAudio(unordered_map<TileType, FxInfo> mapping,
-                         TileType tileType)
-{
-    if (mapping.find(tileType) != mapping.end())
-    {
-        FxInfo fxInfo = Audio.interaction_mapping[tileType];
-        AudioData* audio = &Audio.Fx[fxInfo.start_idx];
-
-        PlaybackSettings playback = {&Player.body};
-
-        if (Player.orientation == WEST)
-        {
-            playback.pan = -BUMP_PAN;
-        }
-        else if (Player.orientation == EAST)
-        {
-            playback.pan = BUMP_PAN;
-        }
-        else if (Player.orientation == SOUTH)
         {
             playback.lowpass_filter = BACK_LP_CO;
         }
@@ -154,8 +128,8 @@ void ExecuteAction(TileType interactionType)
             else
             {
                 Level.has_key = true;
-                PlayAudio(&Audio.OpenChest, {&GlobalVoice});
-                PlayAudio(&Audio.ObtainKeys, {&GlobalVoice}, false);
+                PlayAudio(&Audio.OpenChest, {&GlobalStereo});
+                PlayAudio(&Audio.ObtainKeys, {&GlobalStereo}, false);
             }
         }
         break;
@@ -164,8 +138,8 @@ void ExecuteAction(TileType interactionType)
         {
             if (Level.has_key)
             {
-                PlayAudio(&Audio.UnlockDoor, {&GlobalVoice}, true);
-                PlayAudio(&Audio.SuccessSound, {&GlobalVoice}, false);
+                PlayAudio(&Audio.UnlockDoor, {&GlobalStereo}, true);
+                PlayAudio(&Audio.SuccessSound, {&GlobalStereo}, false);
             }
             else
             {
