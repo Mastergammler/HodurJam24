@@ -76,6 +76,11 @@ enum TileType
     WOOD,
 
     /**
+     * No 3
+     */
+    GRASS,
+
+    /**
      * 'C'
      */
     CHEST,
@@ -99,6 +104,11 @@ enum TileType
      * Workaround 2 for next thingy
      */
     HUH,
+
+    /**
+     * Workaround 3
+     */
+    POCKET
 };
 
 struct FxInfo

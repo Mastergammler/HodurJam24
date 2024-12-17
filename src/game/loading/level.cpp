@@ -12,7 +12,7 @@ void LoadLevel(int level)
 
     Level.level_name = levelName;
     Level.number = level;
-    Level.has_key = false;
+    Level.player_has_key = false;
     Level.map = LoadMap(levelName);
     v2 doorPos = PositionOf(DOOR);
 

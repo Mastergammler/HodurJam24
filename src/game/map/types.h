@@ -39,7 +39,7 @@ struct LevelState
 {
     int number;
     string level_name;
-    bool has_key;
+    bool player_has_key;
 
     Map map = {0, 0};
     Tile current_tile = {WALL, {-1, -1}, false};

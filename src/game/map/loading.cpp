@@ -11,6 +11,7 @@ TileType ParseTileType(char c)
         case '0': return STONE;
         case '1': return CARPET;
         case '2': return WOOD;
+        case '3': return GRASS;
         case 'C': return CHEST;
         case 'D': return DOOR;
         case 'O': return PILLAR;
@@ -25,7 +26,8 @@ bool IsWalkable(TileType type)
     {
         case STONE:
         case CARPET:
-        case WOOD: return true;
+        case WOOD:
+        case GRASS: return true;
         default: return false;
     }
 }

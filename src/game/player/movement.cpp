@@ -72,7 +72,7 @@ void PlayFootstepAudio(TileType type, bool isFirst, v2 direction)
     }
 }
 
-void PlayTileAudio(TileType type, v2 direction)
+void PlayTileAudio(TileType type, v2 direction, float volume = 1)
 {
     if (Audio.fx_mapping.find(type) != Audio.fx_mapping.end())
     {
@@ -82,6 +82,7 @@ void PlayTileAudio(TileType type, v2 direction)
 
         PlaybackSettings playback = {};
         playback.settings = &Player.body;
+        playback.volume = volume;
 
         if (direction == WEST)
         {
@@ -125,13 +126,13 @@ void ExecuteAction(TileType interactionType)
     {
         case CHEST:
         {
-            if (Level.has_key)
+            if (Level.player_has_key)
             {
                 PlayTileAudio(HUH, INIT);
             }
             else
             {
-                Level.has_key = true;
+                Level.player_has_key = true;
                 PlayAudio(&Audio.OpenChest, {&GlobalStereo});
                 PlayAudio(&Audio.ObtainKeys, {&GlobalStereo, false});
             }
@@ -140,12 +141,12 @@ void ExecuteAction(TileType interactionType)
 
         case DOOR:
         {
-            if (Level.has_key)
+            if (Level.player_has_key)
             {
                 Player.inputs_locked = true;
                 PlayAudio(&Audio.UnlockDoor, {&GlobalStereo});
                 PlayAudio(&Audio.SuccessSound, {&GlobalStereo, false});
-                ScheduleExecution(2, LoadNextLevel);
+                ScheduleExecution(8, LoadNextLevel);
             }
             else
             {
@@ -197,6 +198,10 @@ void HandleMovement()
         Level.current_tile = nextTile;
 
         PlayFootstepAudio(nextTile.type, true, direction);
+        if (Level.player_has_key)
+        {
+            PlayTileAudio(POCKET, INIT, 0.65);
+        }
     }
     else
     {

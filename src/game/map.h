@@ -13,6 +13,8 @@ static unordered_map<string, TileType> FX_MAPPING = {
                                         {"footstep-stone", STONE},
                                         {"footstep-carpet", CARPET},
                                         {"footstep-wood-hi", WOOD},
+                                        // TODO: fix naming
+                                        {"footsteps-grass", GRASS},
                                         {"wall-bump", WALL},
                                         {"chest-bump", CHEST},
                                         {"door-bump", DOOR},
@@ -22,6 +24,7 @@ static unordered_map<string, TileType> FX_MAPPING = {
                                         //  -> I have to find another solution
                                         {"nope-sound", NOOP},
                                         {"huh", HUH},
+                                        {"pocket-keys", POCKET},
 };
 
 Map LoadMap(string name);
