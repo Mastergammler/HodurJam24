@@ -3,6 +3,7 @@
 #include "module.h"
 #include "types.h"
 
+#include "bear/types.h"
 #include "map/types.h"
 #include "player/types.h"
 #include "systems/types.h"
@@ -11,9 +12,11 @@
 static ExitCallback ExitFunction;
 static HodurInputState GameInputs = {18, new KeyInput[18]};
 static LoadedAudio Audio;
+static UiState Ui;
+
 static Player Player;
 static LevelState Level;
-static UiState Ui;
+static Bear Bear;
 
 /**
  * Stereo voice playback for non directional things
