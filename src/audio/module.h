@@ -19,4 +19,5 @@ void PlayAudio(AudioData* audio, PlaybackSettings playback);
 void SchedulePlayback(AudioData* audio,
                       PlaybackSettings settings,
                       float delayInS);
+void StopAudio(VoiceSettings& settings);
 void AudioQueue_ClearSchedule();

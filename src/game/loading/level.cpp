@@ -4,7 +4,7 @@
 
 void LoadLevel(int level)
 {
-    Ui.is_active = false;
+    UiExit();
 
     // TODO: play reset sound
     // stop all current audio
@@ -19,7 +19,7 @@ void LoadLevel(int level)
     // TODO: not flexible, if the door is on the sides
     v2 playerStart = doorPos + v2{0, -1};
     Player.position = playerStart;
-    Player.in_animation = false;
+    Player.in_walk_anim = false;
     Player.time_since_anim_start = 0;
 
     PlayNumberSound(level, 2);

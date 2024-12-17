@@ -56,6 +56,8 @@ struct PlaybackSettings
      */
     bool interrupt_previous = true;
 
+    bool looping;
+
     float volume = 1.;
     float pan = 0.;
     float lowpass_filter = 1;

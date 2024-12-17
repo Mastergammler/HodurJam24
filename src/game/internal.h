@@ -19,3 +19,4 @@ static UiState Ui;
  */
 static VoiceSettings GlobalStereo;
 static VoiceSettings GlobalMono;
+static VoiceSettings Ambience;

@@ -45,6 +45,7 @@ void CreateVoices()
     CreateVoiceForAudio(&Audio.fx[0], Player.right_foot);
     CreateVoiceForAudio(&Audio.fx[0], Player.body);
     CreateVoiceForAudio(&Audio.DangerSound, GlobalStereo);
+    CreateVoiceForAudio(&Audio.MenuAtmo, Ambience);
     CreateVoiceForAudio(&Audio.ui[0], GlobalMono);
 }
 

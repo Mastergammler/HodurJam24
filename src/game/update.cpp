@@ -22,11 +22,12 @@ void Game_Update()
         if (GameInputs.Reset.released) LoadLevel(Level.number);
         if (GameInputs.Exit.released)
         {
-            // TODO: actual enter ui function, that stops all sounds etc
-            Ui.is_active = true;
+            UiEnter();
             return;
         }
 
+        // is this the right order? After the other inputs are handeled?
+        CountLockTime();
         HandleMovement();
         HandleActions();
     }

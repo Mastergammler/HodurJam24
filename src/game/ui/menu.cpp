@@ -48,3 +48,18 @@ void HandleInputs()
         PlayNumberSound(Ui.current_level, BEFORE_NUM);
     }
 }
+
+void UiEnter()
+{
+    Ui.is_active = true;
+    // TODO: stop all other audio (rather responsibility game exit?)
+
+    PlayAudio(&Audio.UiEnter, {&GlobalStereo});
+    SchedulePlayback(&Audio.MenuAtmo, {&Ambience, true, true, 0.8}, 0.3);
+}
+
+void UiExit()
+{
+    Ui.is_active = false;
+    StopAudio(Ambience);
+}

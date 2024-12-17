@@ -121,6 +121,8 @@ struct LoadedAudio
     AudioData UiUp;
     AudioData UiRight;
     AudioData UiLeft;
+    AudioData UiEnter;
+    AudioData MenuAtmo;
 
     AudioData* fx;
     int fx_count;

@@ -2,3 +2,5 @@
 
 void HandleActions();
 void HandleMovement();
+void CountLockTime();
+void LockInputsFor(float timeInS);

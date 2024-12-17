@@ -1,5 +1,6 @@
 #include "../internal.h"
 #include "../map.h"
+#include "../player.h"
 
 const v2 NORTH = {0, -1};
 const v2 WEST = {-1, 0};
@@ -11,7 +12,8 @@ const float SEC_STEP_VOL = 0.42;
 const float STEP_BACK_LP_CO = 0.35;
 const float BACK_LP_CO = 0.45;
 const float BUMP_PAN = 0.65;
-const float STEP_ANIM_TIME = .55f;
+
+const float STEP_ANIM_TIME = .45f;
 
 v2 GetMovementDirection()
 {
@@ -98,14 +100,14 @@ void PlayTileAudio(TileType type, v2 direction)
 // TODO: not sure if this is the best solutions it's quit of akward
 //  also if the player continues immediately after stopping then i have overlap
 //  that's not great
-void HandleAnimation()
+void HandleFootstepAnimation()
 {
     Player.time_since_anim_start += Timer.sim_time;
 
     if (Player.time_since_anim_start >= STEP_ANIM_TIME)
     {
         Player.time_since_anim_start = 0;
-        Player.in_animation = false;
+        Player.in_walk_anim = false;
         if (Level.current_tile.is_walkable)
         {
             PlayFootstepAudio(Level.current_tile.type,
@@ -142,6 +144,7 @@ void ExecuteAction(TileType interactionType)
                 //  - with delay (lock controls etc?)
                 //  - wouldn't it be cool, if you now could walk through that
                 //  door? DUnno too much effort rn
+                LockInputsFor(2); // and now transition
                 PlayAudio(&Audio.UnlockDoor, {&GlobalStereo});
                 PlayAudio(&Audio.SuccessSound, {&GlobalStereo, false});
             }
@@ -174,9 +177,9 @@ void HandleActions()
 void HandleMovement()
 {
     v2 direction = GetMovementDirection();
-    if (Player.in_animation)
+    if (Player.in_walk_anim)
     {
-        HandleAnimation();
+        HandleFootstepAnimation();
 
         // giving back control next frame
         return;
@@ -191,7 +194,7 @@ void HandleMovement()
     {
         Player.orientation = direction;
         Player.position = nextPosition;
-        Player.in_animation = true;
+        Player.in_walk_anim = true;
         Level.current_tile = nextTile;
 
         PlayFootstepAudio(nextTile.type, true, direction);
@@ -201,4 +204,28 @@ void HandleMovement()
         Player.orientation = direction;
         PlayTileAudio(nextTile.type, direction);
     }
+}
+
+void CountLockTime()
+{
+    if (Player.inputs_locked)
+    {
+        Player.time_since_lock_start += Timer.sim_time;
+        if (Player.target_lock_time >= Player.time_since_lock_start)
+        {
+            Player.inputs_locked = false;
+            Player.target_lock_time = 0;
+            Player.time_since_lock_start = 0;
+        }
+    }
+}
+
+/*
+ * Resets/overrides previous lock timings
+ */
+void LockInputsFor(float timeInS)
+{
+    Player.inputs_locked = true;
+    Player.target_lock_time = timeInS;
+    Player.time_since_lock_start = 0;
 }

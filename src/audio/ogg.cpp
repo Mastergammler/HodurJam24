@@ -1,5 +1,6 @@
 // TODO: separate win specific from other code
 #include "module.h"
+#include <xaudio2.h>
 
 /**
  * Ogg Vorbis alsways uses 16 bits per sample
@@ -214,6 +215,19 @@ void ApplyLowpass(VoiceSettings* settings, float lowpassValue)
     }
 }
 
+void StopAudio(VoiceSettings& settings)
+{
+    if (settings.voice)
+    {
+        HRESULT hr;
+        hr = settings.voice->Stop();
+        if (FAILED(hr)) Log("Error stoping currently playing audio!");
+
+        hr = settings.voice->FlushSourceBuffers();
+        if (FAILED(hr)) Log("Error flushing source buffers!");
+    }
+}
+
 void PlayAudio(AudioData* audio, PlaybackSettings playback)
 {
     if (!ValidatePlayback(audio, playback.settings)) return;
@@ -221,6 +235,11 @@ void PlayAudio(AudioData* audio, PlaybackSettings playback)
     XAUDIO2_BUFFER audioBuffer = {};
     audioBuffer.pAudioData = audio->data;
     audioBuffer.AudioBytes = audio->byte_count;
+
+    if (playback.looping)
+    {
+        audioBuffer.LoopCount = XAUDIO2_LOOP_INFINITE;
+    }
 
     IXAudio2SourceVoice* voice = playback.settings->voice;
 

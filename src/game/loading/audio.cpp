@@ -73,9 +73,11 @@ void LoadStaticAudio()
     LoadOggAsPcm(Audio.ObtainKeys, "res/amb/s_obtain-keys.ogg");
     LoadOggAsPcm(Audio.UnlockDoor, "res/amb/s_unlock-door.ogg");
 
-    // TODO: handle this via mapping is better?
+    // TODO: handle this via mapping might be better?
     LoadOggAsPcm(Audio.UiDown, "res/ui/s_whoosh-001.ogg");
     LoadOggAsPcm(Audio.UiUp, "res/ui/s_whoosh-002.ogg");
     LoadOggAsPcm(Audio.UiRight, "res/ui/s_whoosh-003.ogg");
     LoadOggAsPcm(Audio.UiLeft, "res/ui/s_whoosh-004.ogg");
+    LoadOggAsPcm(Audio.UiEnter, "res/ui/s_big-whoosh.ogg");
+    LoadOggAsPcm(Audio.MenuAtmo, "res/amb/s_menu-ambience.ogg");
 }
