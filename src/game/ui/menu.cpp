@@ -52,7 +52,7 @@ void HandleInputs()
 void UiEnter()
 {
     Ui.is_active = true;
-    // TODO: stop all other audio (rather responsibility game exit?)
+    // TODO: stop all other audio (rather responsibility of game exit?)
 
     PlayAudio(&Audio.UiEnter, {&GlobalStereo});
     SchedulePlayback(&Audio.MenuAtmo, {&Ambience, true, true, 0.8}, 0.3);

@@ -1,6 +1,8 @@
 #include "../internal.h"
+#include "../loading.h"
 #include "../map.h"
 #include "../player.h"
+#include "../systems.h"
 
 const v2 NORTH = {0, -1};
 const v2 WEST = {-1, 0};
@@ -140,13 +142,10 @@ void ExecuteAction(TileType interactionType)
         {
             if (Level.has_key)
             {
-                // TODO: trigger change to next level
-                //  - with delay (lock controls etc?)
-                //  - wouldn't it be cool, if you now could walk through that
-                //  door? DUnno too much effort rn
-                LockInputsFor(2); // and now transition
+                Player.inputs_locked = true;
                 PlayAudio(&Audio.UnlockDoor, {&GlobalStereo});
                 PlayAudio(&Audio.SuccessSound, {&GlobalStereo, false});
+                ScheduleExecution(2, LoadNextLevel);
             }
             else
             {
@@ -204,28 +203,4 @@ void HandleMovement()
         Player.orientation = direction;
         PlayTileAudio(nextTile.type, direction);
     }
-}
-
-void CountLockTime()
-{
-    if (Player.inputs_locked)
-    {
-        Player.time_since_lock_start += Timer.sim_time;
-        if (Player.target_lock_time >= Player.time_since_lock_start)
-        {
-            Player.inputs_locked = false;
-            Player.target_lock_time = 0;
-            Player.time_since_lock_start = 0;
-        }
-    }
-}
-
-/*
- * Resets/overrides previous lock timings
- */
-void LockInputsFor(float timeInS)
-{
-    Player.inputs_locked = true;
-    Player.target_lock_time = timeInS;
-    Player.time_since_lock_start = 0;
 }

@@ -1,6 +1,7 @@
 #include "internal.h"
 #include "loading.h"
 #include "map.h"
+#include "systems.h"
 #include "utils/parsing.cpp"
 
 void InitInputs()
@@ -68,9 +69,12 @@ void LoadAudio()
 void Game_Init(ExitCallback exitFunction)
 {
     ExitFunction = exitFunction;
+
     InitInputs();
     Audio_Init();
     LoadAudio();
+
+    Schedule_Init(8);
 
     // TEST: testing
     Ui.current_level = 1;

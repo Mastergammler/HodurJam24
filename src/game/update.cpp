@@ -1,11 +1,13 @@
 #include "internal.h"
 #include "loading.h"
 #include "player.h"
+#include "systems.h"
 #include "ui.h"
 
 void Game_Update()
 {
     Audio_Update(Timer.sim_time);
+    Schedule_Update(Timer.sim_time);
 
     if (Ui.is_active)
     {
@@ -16,9 +18,6 @@ void Game_Update()
     }
     else
     {
-        if (GameInputs.F1.released) LoadLevel(1);
-        if (GameInputs.F2.released) LoadLevel(2);
-        if (GameInputs.F3.released) LoadLevel(3);
         if (GameInputs.Reset.released) LoadLevel(Level.number);
         if (GameInputs.Exit.released)
         {
@@ -26,8 +25,9 @@ void Game_Update()
             return;
         }
 
-        // is this the right order? After the other inputs are handeled?
-        CountLockTime();
+        if (Player.inputs_locked) return;
+
+        // TODO: handle inputs
         HandleMovement();
         HandleActions();
     }

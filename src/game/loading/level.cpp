@@ -21,9 +21,21 @@ void LoadLevel(int level)
     Player.position = playerStart;
     Player.in_walk_anim = false;
     Player.time_since_anim_start = 0;
+    Player.inputs_locked = false;
 
     PlayNumberSound(level, 2);
     PlayAudio(&Audio.DangerSound, {&GlobalStereo});
     PlayAudio(&Audio.LockIn, {&GlobalStereo, false});
     Logf("Loading level %s", levelName.c_str());
+}
+
+void LoadNextLevel()
+{
+    if (Ui.current_level >= Ui.level_count)
+    {
+        Logf("No next level available, last level is %i", Ui.current_level);
+        return;
+    }
+
+    LoadLevel(++Ui.current_level);
 }

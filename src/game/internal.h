@@ -5,6 +5,7 @@
 
 #include "map/types.h"
 #include "player/types.h"
+#include "systems/types.h"
 #include "ui/types.h"
 
 static ExitCallback ExitFunction;

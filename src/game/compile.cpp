@@ -6,5 +6,6 @@
 #include "map/loading.cpp"
 #include "map/map.cpp"
 #include "player/movement.cpp"
+#include "systems/schedule.cpp"
 #include "ui/menu.cpp"
 #include "ui/numbers.cpp"
