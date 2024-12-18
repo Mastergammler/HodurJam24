@@ -108,6 +108,7 @@ struct LoadedAudio
     AudioData OpenChest;
     AudioData DangerSound;
     AudioData SuccessSound;
+    AudioData FailSound;
     AudioData LockIn;
     AudioData ObtainKeys;
     AudioData UnlockDoor;
@@ -122,6 +123,7 @@ struct LoadedAudio
     AudioData* fx;
     int fx_count;
     unordered_map<TileType, FxInfo> fx_mapping;
+    unordered_map<TileType, FxInfo> bear_fx_mapping;
 
     AudioData* ui;
     int ui_count;

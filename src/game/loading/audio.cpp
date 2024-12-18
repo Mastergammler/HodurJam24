@@ -1,6 +1,7 @@
 #include "../internal.h"
 #include "../map.h"
 
+// TODO: mapping audio files for multiple things?
 void AddMapping(string fileName, int index, FxInfo** lastInfo)
 {
     for (const auto& pair : FX_MAPPING)
@@ -18,7 +19,28 @@ void AddMapping(string fileName, int index, FxInfo** lastInfo)
                 Audio.fx_mapping.insert({newInfo.type, newInfo});
                 *lastInfo = &Audio.fx_mapping[newInfo.type];
             }
-            break;
+            // every file is only allowed to be mapped once atm
+            return;
+        }
+    }
+
+    for (const auto& pair : BEAR_FX_MAPPING)
+    {
+        if (starts_with(fileName, pair.first))
+        {
+            FxInfo* last = *lastInfo;
+            if (last != NULL && last->type == pair.second)
+            {
+                last->count++;
+            }
+            else
+            {
+                FxInfo newInfo = {pair.second, index, 1};
+                Audio.bear_fx_mapping.insert({newInfo.type, newInfo});
+                *lastInfo = &Audio.bear_fx_mapping[newInfo.type];
+            }
+            // every file is only allowed to be mapped once atm
+            return;
         }
     }
 }
@@ -69,6 +91,7 @@ void LoadStaticAudio()
     LoadOggAsPcm(Audio.OpenChest, "res/amb/s_open-chest.ogg");
     LoadOggAsPcm(Audio.DangerSound, "res/amb/s_level-start.ogg");
     LoadOggAsPcm(Audio.SuccessSound, "res/amb/s_level-success.ogg");
+    LoadOggAsPcm(Audio.FailSound, "res/amb/s_level-fail.ogg");
     LoadOggAsPcm(Audio.LockIn, "res/amb/s_lock-in.ogg");
     LoadOggAsPcm(Audio.ObtainKeys, "res/amb/s_obtain-keys.ogg");
     LoadOggAsPcm(Audio.UnlockDoor, "res/amb/s_unlock-door.ogg");

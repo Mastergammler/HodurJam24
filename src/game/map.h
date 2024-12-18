@@ -3,6 +3,7 @@
 
 #include "internal.h"
 #include "types.h"
+#include <unordered_map>
 
 #define NAMEOF(x) #x
 
@@ -13,7 +14,6 @@ static unordered_map<string, TileType> FX_MAPPING = {
                                         {"footstep-stone", STONE},
                                         {"footstep-carpet", CARPET},
                                         {"footstep-wood-hi", WOOD},
-                                        // TODO: fix naming
                                         {"footsteps-grass", GRASS},
                                         {"wall-bump", WALL},
                                         {"chest-bump", CHEST},
@@ -25,6 +25,14 @@ static unordered_map<string, TileType> FX_MAPPING = {
                                         {"nope-sound", NOOP},
                                         {"huh", HUH},
                                         {"pocket-keys", POCKET},
+};
+
+static unordered_map<string, TileType> BEAR_FX_MAPPING = {
+                                        {"footsteps-bear-stone", STONE},
+                                        {"footsteps-bear-stone", CARPET},
+                                        {"footsteps-bear-stone", WOOD},
+                                        {"footsteps-bear-stone", GRASS}
+
 };
 
 Map LoadMap(string name);

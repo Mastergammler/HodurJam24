@@ -1,3 +1,4 @@
+#include "../bear.h"
 #include "../internal.h"
 #include "../loading.h"
 #include "../map.h"
@@ -141,7 +142,7 @@ void ExecuteAction(TileType interactionType)
                 Player.inputs_locked = true;
                 PlayAudio(&Audio.UnlockDoor, {&GlobalStereo});
                 PlayAudio(&Audio.SuccessSound, {&GlobalStereo, false});
-                ScheduleExecution(8, LoadNextLevel);
+                ScheduleExecution(10, LoadNextLevel);
             }
             else
             {
@@ -195,8 +196,11 @@ void HandleMovement()
         PlayFootstepAudio(nextTile.type, true, direction);
         if (Level.player_has_key)
         {
-            PlayTileAudio(POCKET, INIT, 0.65);
+            // TODO: delay for grass sounds, because else it feels strange
+            PlayTileAudio(POCKET, INIT, 0.75);
         }
+
+        Bear_MoveTowardsPlayer();
     }
     else
     {

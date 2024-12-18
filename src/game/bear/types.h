@@ -7,6 +7,8 @@ struct Bear
 
     v2 position;
 
+    VoiceSettings body;
+
     // TODO: do i need an orientation?
 };
 

@@ -27,7 +27,8 @@ void LoadLevel(int level)
     Player.time_since_anim_start = 0;
     Player.inputs_locked = false;
 
-    // TODO: bear loading
+    // TODO: bear loading -> via map etc
+    Bear.position = {0, 0};
 
     PlayNumberSound(level, 2);
     PlayAudio(&Audio.DangerSound, {&GlobalStereo});

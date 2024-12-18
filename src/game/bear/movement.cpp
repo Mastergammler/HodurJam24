@@ -1,11 +1,10 @@
 #include "../internal.h"
 #include "../map.h"
-#include <rpcndr.h>
 
 void EvaluatePosition(v2 direction, NodeItem prevNode, v2 target)
 {
     // initial open nodes
-    NodeItem* node = &Nodes.items[Nodes.count];
+    NodeItem* forEval = &Nodes.items[Nodes.count];
     v2 localStart = prevNode.position;
     v2 nextPosition = localStart + direction;
 
@@ -17,12 +16,12 @@ void EvaluatePosition(v2 direction, NodeItem prevNode, v2 target)
 
         Nodes.count++;
 
-        node->is_closed = false;
-        node->position = nextPosition;
-        node->g_value = walk_distance(localStart, nextPosition) +
-                        prevNode.g_value;
-        node->h_value = walk_distance(nextPosition, target);
-        node->f_value = node->g_value + node->h_value;
+        forEval->is_closed = false;
+        forEval->position = nextPosition;
+        forEval->g_value = walk_distance(localStart, nextPosition) +
+                           prevNode.g_value;
+        forEval->h_value = walk_distance(nextPosition, target);
+        forEval->f_value = forEval->g_value + forEval->h_value;
     }
 }
 
@@ -46,14 +45,48 @@ NodeItem* SelectNextNode()
     if (smallestItem)
     {
         // we're closing this, because we're evaluating this next
+        // unless it's the destination, then we don't need to
+        // but it therefore is irrelevant for the algorithm?
         smallestItem->is_closed = true;
     }
     return smallestItem;
 }
 
-// TODO: handle node duplicates / collisions
 /**
- * A* algorithm for finding the next tile to move to
+ * Finds the next neighbour path tile
+ * TODO: wouldn't it be more optimal to sort, for closed nodes & also
+ * sort those by smallest f and g or something? Wouldn't this work?
+ */
+NodeItem* NextPathNode(NodeItem* neighbour)
+{
+    NodeItem* next = NULL;
+
+    for (int i = 0; i < Nodes.count; i++)
+    {
+        NodeItem cur = Nodes.items[i];
+        if (!cur.is_closed) continue;
+
+        int distance = walk_distance(neighbour->position, cur.position);
+        if (distance == 1)
+        {
+            if (!next || next->f_value > cur.f_value)
+            {
+                next = &Nodes.items[i];
+            }
+        }
+    }
+
+    // there must be a next node, else the algorithm did fail
+    // if there is no path, this function should not be called
+    assert(next);
+    return next;
+}
+
+// TODO: handle node duplicates /
+// collisions
+/**
+ * A* algorithm for finding the next
+ * tile to move to
  */
 v2 DetermineNextPosition(v2 startPosition, v2 targetPosition)
 {
@@ -82,12 +115,37 @@ v2 DetermineNextPosition(v2 startPosition, v2 targetPosition)
         prevNode = *next;
     }
 
-    // go through closed nodes
-    // -> lowest f value, from target towards start
-    // -> From neighbour to neighbour
+    if (noPathPossible) return INIT;
+
+    NodeItem* nextNode = &prevNode;
+    while (nextNode->g_value > 1)
+    {
+        nextNode = NextPathNode(nextNode);
+    }
+
+    if (nextNode->h_value == 1)
+    {
+        Log("Bear proximity aleart!!!");
+    }
+
+    v2 nextMove = nextNode->position - startPosition;
+    return nextMove;
 }
 
-void MoveTowardsPlayer()
+void PlayFootstepAudio(TileType type, float delay)
+{
+    if (Audio.bear_fx_mapping.find(type) != Audio.bear_fx_mapping.end())
+    {
+        FxInfo fxInfo = Audio.bear_fx_mapping[type];
+        int idxOffset = rand() % fxInfo.count;
+        AudioData* audio = &Audio.fx[fxInfo.start_idx + idxOffset];
+
+        PlaybackSettings playback = {&Bear.body};
+        SchedulePlayback(audio, playback, delay);
+    }
+}
+
+void Bear_MoveTowardsPlayer()
 {
     Clock pathClock = {};
     Measure_Start(pathClock);
@@ -95,8 +153,24 @@ void MoveTowardsPlayer()
     float elapsed = Measure_Elapsed(pathClock);
 
     Bear.position = Bear.position + direction;
-    Logf("Next bear position is (%i,%i) took .2f",
+    Logf("Next bear position is (%i,%i) took %.2f",
          Bear.position.x,
          Bear.position.y,
          elapsed);
+
+    if (Bear.position == Player.position)
+    {
+        Player.inputs_locked = true;
+        PlaybackSettings playback = {&GlobalStereo};
+        playback.volume = 1.5f;
+        PlayAudio(&Audio.FailSound, playback);
+    }
+    else
+    {
+        Tile bearTile = TileAt(Bear.position);
+        PlayFootstepAudio(bearTile.type, 1);
+        PlayFootstepAudio(bearTile.type, 1.2);
+        PlayFootstepAudio(bearTile.type, 1.5);
+        PlayFootstepAudio(bearTile.type, 1.7);
+    }
 }
