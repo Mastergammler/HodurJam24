@@ -12,6 +12,15 @@ void EvaluatePosition(v2 direction, NodeItem prevNode, v2 target)
 
     if (tile.is_walkable)
     {
+        // PERF: this is crazy, this increases alg runtime (for 7x10 map) from
+        // 0.005 ms to around 8 ms each, crazy, despite only beeing 1 LOG per
+        // position ...
+        // Maybe my thread logging is not quite working yet???
+
+        /*Logf("Evaluating walkable node: %i (%i,%i)",
+             Nodes.count,
+             nextPosition.x,
+             nextPosition.y);*/
         assert(Nodes.count < Nodes.max_size);
 
         Nodes.count++;
@@ -82,8 +91,9 @@ NodeItem* NextPathNode(NodeItem* neighbour)
     return next;
 }
 
-// TODO: handle node duplicates /
-// collisions
+// FIXME: handle node duplicates / collisions
+// Without doing that, i'll run out of the allocated space,
+// because nodes will be added multiple times
 /**
  * A* algorithm for finding the next
  * tile to move to
@@ -153,7 +163,7 @@ void Bear_MoveTowardsPlayer()
     float elapsed = Measure_Elapsed(pathClock);
 
     Bear.position = Bear.position + direction;
-    Logf("Next bear position is (%i,%i) took %.2f",
+    Logf("Next bear position is (%i,%i) - %.3f ms",
          Bear.position.x,
          Bear.position.y,
          elapsed);

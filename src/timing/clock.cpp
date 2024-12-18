@@ -66,6 +66,9 @@ void Measure_Update(Clock& timer)
     UpdateTimer(timer);
 }
 
+/**
+ * Measures the elapsed time for the counter in ms
+ */
 float Measure_Elapsed(Clock& timer)
 {
     return QueryDeltaTime(timer);

@@ -20,6 +20,7 @@ void LoadLevel(int level)
     Nodes.max_size = Level.map.total_tiles;
     Nodes.items = new NodeItem[Nodes.max_size]();
     Nodes.count = 0;
+    Logf("Max node size is: %i", Nodes.max_size);
 
     v2 playerStart = doorPos + v2{0, -1};
     Player.position = playerStart;
