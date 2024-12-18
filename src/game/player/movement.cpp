@@ -4,11 +4,6 @@
 #include "../player.h"
 #include "../systems.h"
 
-const v2 NORTH = {0, -1};
-const v2 WEST = {-1, 0};
-const v2 EAST = {1, 0};
-const v2 SOUTH = {0, 1};
-const v2 INIT = {0, 0};
 const float STEP_PAN = 0.2;
 const float SEC_STEP_VOL = 0.42;
 const float STEP_BACK_LP_CO = 0.35;

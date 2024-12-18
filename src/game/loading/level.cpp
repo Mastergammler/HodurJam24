@@ -16,12 +16,18 @@ void LoadLevel(int level)
     Level.map = LoadMap(levelName);
     v2 doorPos = PositionOf(DOOR);
 
-    // TODO: not flexible, if the door is on the sides
+    delete Nodes.items;
+    Nodes.max_size = Level.map.total_tiles;
+    Nodes.items = new NodeItem[Nodes.max_size]();
+    Nodes.count = 0;
+
     v2 playerStart = doorPos + v2{0, -1};
     Player.position = playerStart;
     Player.in_walk_anim = false;
     Player.time_since_anim_start = 0;
     Player.inputs_locked = false;
+
+    // TODO: bear loading
 
     PlayNumberSound(level, 2);
     PlayAudio(&Audio.DangerSound, {&GlobalStereo});

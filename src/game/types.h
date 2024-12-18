@@ -2,21 +2,6 @@
 
 #include "module.h"
 
-struct v2
-{
-    int x, y;
-};
-
-inline const v2 operator+(const v2 vector, v2 other)
-{
-    return {vector.x + other.x, vector.y + other.y};
-}
-
-inline bool operator==(const v2 vector, v2 other)
-{
-    return vector.x == other.x && vector.y == other.y;
-}
-
 struct HodurInputState : InputState
 {
     HodurInputState(int inputCount, KeyInput* inputs)
