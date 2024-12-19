@@ -15,6 +15,7 @@ const v2 WEST = {-1, 0};
 const v2 EAST = {1, 0};
 const v2 SOUTH = {0, 1};
 const v2 INIT = {0, 0};
+const v2 TRAPPED = {-1, -1};
 
 static ExitCallback ExitFunction;
 static HodurInputState GameInputs = {18, new KeyInput[18]};

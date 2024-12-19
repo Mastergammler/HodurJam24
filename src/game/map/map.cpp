@@ -1,6 +1,6 @@
 #include "../internal.h"
 
-static Tile NULL_TILE = {WALL, v2{-1, -1}, false};
+static Tile NULL_TILE = {WALL, TRAPPED, false};
 
 Tile TileAt(v2 pos)
 {
@@ -23,6 +23,6 @@ v2 PositionOf(TileType type)
             if (cur.type == type) return {col, row};
         }
     }
-    // TODO: not quite sure about this, if this makes sense
-    return {-1, -1};
+
+    return TRAPPED;
 }

@@ -2,7 +2,7 @@
 #include "../map.h"
 
 /**
- * time complexity: n = count
+ * O(n = count)
  */
 NodeItem* NodeItemForPosition(v2 position)
 {
@@ -18,7 +18,9 @@ NodeItem* NodeItemForPosition(v2 position)
     return newNode;
 }
 
-// time complexity: n
+/*
+ * O(n = count)
+ */
 void EvaluatePosition(v2 direction, NodeItem prevNode, v2 target)
 {
     v2 localStart = prevNode.position;
@@ -52,7 +54,7 @@ void EvaluatePosition(v2 direction, NodeItem prevNode, v2 target)
 }
 
 /**
- * time complexity: n = count
+ * O(n) / n = count
  */
 NodeItem* SelectNextNode()
 {
@@ -75,7 +77,6 @@ NodeItem* SelectNextNode()
     {
         // we're closing this, because we're evaluating this next
         // unless it's the destination, then we don't need to
-        // but it therefore is irrelevant for the algorithm?
         smallestItem->is_closed = true;
     }
     return smallestItem;
@@ -83,11 +84,12 @@ NodeItem* SelectNextNode()
 
 /**
  * Finds the next neighbour path tile
- * TODO: wouldn't it be more optimal to sort, for closed nodes & also
+ * PERF: wouldn't it be more optimal to sort, for closed nodes & also
  * sort those by smallest f and g or something? Wouldn't this work?
- * TC:: n = count
+ * but this would be O(n log n) -> so this is more inefficient?
+ *
+ * O(n) / n = count
  */
-
 NodeItem* NextPathNode(NodeItem* neighbour)
 {
     NodeItem* next = NULL;
@@ -124,10 +126,17 @@ NodeItem* NextPathNode(NodeItem* neighbour)
  */
 v2 DetermineNextPosition(v2 startPosition, v2 targetPosition)
 {
-    Nodes.count = 1;
     // g value on the starting tile is 0, because we are there already
+    int gValue = 0;
     int distance = walk_distance(startPosition, targetPosition);
-    Nodes.items[0] = {true, startPosition, 0, distance, distance};
+
+    // NOTE:
+    // this handling is a bit akward, usually the start node would be the first
+    //  to put into the alg, and then be evaluated and closed
+    //  but i did it a bit differently, since i reference via tha previous node
+    //  since i just add it as closed node here
+    Nodes.count = 1;
+    Nodes.items[0] = {true, startPosition, gValue, distance, distance};
     NodeItem prevNode = Nodes.items[0];
 
     bool noPathPossible = false;

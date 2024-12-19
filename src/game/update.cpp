@@ -11,17 +11,22 @@ void Game_Update()
 
     if (Ui.is_active)
     {
-        if (GameInputs.Action.released) LoadLevel(Ui.current_level);
+        if (GameInputs.Action.released)
+        {
+            OnUiExit();
+            LoadLevel(Ui.current_level);
+        }
+
         if (GameInputs.Exit.released) ExitFunction();
 
-        HandleInputs();
+        Ui_HandleInputs();
     }
     else
     {
         if (GameInputs.Reset.released) LoadLevel(Level.number);
         if (GameInputs.Exit.released)
         {
-            UiEnter();
+            OnUiEnter();
             return;
         }
 

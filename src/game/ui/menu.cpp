@@ -1,7 +1,7 @@
 #include "../internal.h"
 #include "../ui.h"
 
-void HandleInputs()
+void Ui_HandleInputs()
 {
     int offset = 0;
 
@@ -49,7 +49,7 @@ void HandleInputs()
     }
 }
 
-void UiEnter()
+void OnUiEnter()
 {
     Ui.is_active = true;
     // TODO: stop all other audio (rather responsibility of game exit?)
@@ -58,8 +58,13 @@ void UiEnter()
     SchedulePlayback(&Audio.MenuAtmo, {&Ambience, true, true, 0.8}, 0.3);
 }
 
-void UiExit()
+void OnUiExit()
 {
     Ui.is_active = false;
+
+    // this needs to happen before the level loads!
+    AudioQueue_ClearSchedule();
     StopAudio(Ambience);
+    StopAudio(GlobalMono);
+    StopAudio(GlobalStereo);
 }
