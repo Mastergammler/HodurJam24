@@ -1,13 +1,28 @@
 #include "../internal.h"
 #include "../map.h"
 
+/**
+ * time complexity: n = count
+ */
+NodeItem* NodeItemForPosition(v2 position)
+{
+    for (int i = 0; i < Nodes.count; i++)
+    {
+        NodeItem* cur = &Nodes.items[i];
+        if (cur->position == position) return cur;
+    }
+
+    // TODO: a bit akward to set this here, and then immediately close it again
+    NodeItem* newNode = &Nodes.items[Nodes.count++];
+    newNode->is_closed = false;
+    return newNode;
+}
+
+// time complexity: n
 void EvaluatePosition(v2 direction, NodeItem prevNode, v2 target)
 {
-    // initial open nodes
-    NodeItem* forEval = &Nodes.items[Nodes.count];
     v2 localStart = prevNode.position;
     v2 nextPosition = localStart + direction;
-
     Tile tile = TileAt(nextPosition);
 
     if (tile.is_walkable)
@@ -23,17 +38,22 @@ void EvaluatePosition(v2 direction, NodeItem prevNode, v2 target)
              nextPosition.y);*/
         assert(Nodes.count < Nodes.max_size);
 
-        Nodes.count++;
-
-        forEval->is_closed = false;
-        forEval->position = nextPosition;
-        forEval->g_value = walk_distance(localStart, nextPosition) +
-                           prevNode.g_value;
-        forEval->h_value = walk_distance(nextPosition, target);
-        forEval->f_value = forEval->g_value + forEval->h_value;
+        NodeItem* forEval = NodeItemForPosition(nextPosition);
+        if (!forEval->is_closed)
+        {
+            forEval->is_closed = false;
+            forEval->position = nextPosition;
+            forEval->g_value = walk_distance(localStart, nextPosition) +
+                               prevNode.g_value;
+            forEval->h_value = walk_distance(nextPosition, target);
+            forEval->f_value = forEval->g_value + forEval->h_value;
+        }
     }
 }
 
+/**
+ * time complexity: n = count
+ */
 NodeItem* SelectNextNode()
 {
     NodeItem* smallestItem = NULL;
@@ -65,7 +85,9 @@ NodeItem* SelectNextNode()
  * Finds the next neighbour path tile
  * TODO: wouldn't it be more optimal to sort, for closed nodes & also
  * sort those by smallest f and g or something? Wouldn't this work?
+ * TC:: n = count
  */
+
 NodeItem* NextPathNode(NodeItem* neighbour)
 {
     NodeItem* next = NULL;
@@ -91,28 +113,35 @@ NodeItem* NextPathNode(NodeItem* neighbour)
     return next;
 }
 
-// FIXME: handle node duplicates / collisions
-// Without doing that, i'll run out of the allocated space,
-// because nodes will be added multiple times
 /**
  * A* algorithm for finding the next
  * tile to move to
+ *
+ * TC: O(2 * Nodes.count * n)
+ * Best: n ~ path length * 3
+ * Worst: n = total map tiles
+ * => Still a linear time algorithm, so pretty good
  */
 v2 DetermineNextPosition(v2 startPosition, v2 targetPosition)
 {
-    Nodes.count = 0;
-
+    Nodes.count = 1;
     // g value on the starting tile is 0, because we are there already
-    NodeItem prevNode = {true, startPosition, 0};
+    int distance = walk_distance(startPosition, targetPosition);
+    Nodes.items[0] = {true, startPosition, 0, distance, distance};
+    NodeItem prevNode = Nodes.items[0];
+
     bool noPathPossible = false;
 
+    // n * 5 * listSize  (n = tiles to evaluate / list size / count)
     while (prevNode.position != targetPosition)
     {
+        // 4x listSize
         EvaluatePosition(NORTH, prevNode, targetPosition);
         EvaluatePosition(EAST, prevNode, targetPosition);
         EvaluatePosition(SOUTH, prevNode, targetPosition);
         EvaluatePosition(WEST, prevNode, targetPosition);
 
+        // 1x listSize
         NodeItem* next = SelectNextNode();
         if (next == NULL)
         {
@@ -127,12 +156,14 @@ v2 DetermineNextPosition(v2 startPosition, v2 targetPosition)
 
     if (noPathPossible) return INIT;
 
+    // p * listSize (p = path length)
     NodeItem* nextNode = &prevNode;
-    while (nextNode->g_value > 1)
+    while (nextNode && nextNode->g_value > 1)
     {
         nextNode = NextPathNode(nextNode);
     }
 
+    // TODO: proper proximity handling
     if (nextNode->h_value == 1)
     {
         Log("Bear proximity aleart!!!");
@@ -178,9 +209,11 @@ void Bear_MoveTowardsPlayer()
     else
     {
         Tile bearTile = TileAt(Bear.position);
+        // TODO: randomize times a bit?
+        //-> Would probably feel alot better
         PlayFootstepAudio(bearTile.type, 1);
-        PlayFootstepAudio(bearTile.type, 1.2);
-        PlayFootstepAudio(bearTile.type, 1.5);
-        PlayFootstepAudio(bearTile.type, 1.7);
+        PlayFootstepAudio(bearTile.type, 1.18);
+        PlayFootstepAudio(bearTile.type, 1.4);
+        PlayFootstepAudio(bearTile.type, 1.62);
     }
 }
