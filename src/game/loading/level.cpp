@@ -2,6 +2,10 @@
 #include "../map.h"
 #include "../ui.h"
 
+// TODO: Do i maybe want to specify the start position in the map?
+//  - This would give more flexibility
+//  - But also make the game yet a bit harder?
+//  -> The Door -> Chest -> Door makes quite sense i think
 v2 DeterminePlayerStart()
 {
     v2 doorPos = PositionOf(DOOR);
@@ -46,7 +50,7 @@ void LoadLevel(int level)
     // TODO: bear loading -> via map etc
     Bear.position = {0, 0};
 
-    PlayNumberSound(level, 1.8);
+    PlayNumberSound(level, 1.6);
     PlayAudio(&Audio.DangerSound, {&GlobalStereo});
     PlayAudio(&Audio.LockIn, {&GlobalStereo, false});
     Logf("Loading level %s (%i tiles)",

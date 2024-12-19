@@ -1,5 +1,7 @@
 #include "../internal.h"
 #include "../map.h"
+#include <corecrt_math_defines.h>
+#include <winuser.h>
 
 /**
  * O(n = count)
@@ -182,7 +184,10 @@ v2 DetermineNextPosition(v2 startPosition, v2 targetPosition)
     return nextMove;
 }
 
-void PlayFootstepAudio(TileType type, float delay)
+void PlayFootstepAudio(TileType type,
+                       float delay,
+                       float volume = 1,
+                       float pan = 0)
 {
     if (Audio.bear_fx_mapping.find(type) != Audio.bear_fx_mapping.end())
     {
@@ -191,8 +196,32 @@ void PlayFootstepAudio(TileType type, float delay)
         AudioData* audio = &Audio.fx[fxInfo.start_idx + idxOffset];
 
         PlaybackSettings playback = {&Bear.body};
+        playback.volume = volume;
+        playback.pan = pan;
+
         SchedulePlayback(audio, playback, delay);
     }
+}
+
+float GetPan(v2 playerPosition, v2 bearPosition)
+{
+    // NOTE: Due to the top down perspective and the notion that NORTH is
+    // upwards
+    //  we have to switch left and right, because the player is in fact turned
+    //  180 Deg relative to the map orientation (where y + 1 = downward)
+    v2 distance = {bearPosition.x - playerPosition.x,
+                   playerPosition.y - bearPosition.y};
+
+    double angleRad = atan2(distance.y, distance.x) - M_PI_2;
+    float pan = angleRad * 2 / M_PI;
+
+    Logf("Pan for (%i,%i) :  %.2f - %.2f",
+         distance.x,
+         distance.y,
+         angleRad,
+         pan);
+
+    return pan;
 }
 
 void Bear_MoveTowardsPlayer()
@@ -203,9 +232,10 @@ void Bear_MoveTowardsPlayer()
     float elapsed = Measure_Elapsed(pathClock);
 
     Bear.position = Bear.position + direction;
-    Logf("Next bear position is (%i,%i) - %.3f ms",
+    Logf("Next bear position is (%i,%i) - %i nodes -  %.3f ms",
          Bear.position.x,
          Bear.position.y,
+         Nodes.count,
          elapsed);
 
     if (Bear.position == Player.position)
@@ -214,15 +244,37 @@ void Bear_MoveTowardsPlayer()
         PlaybackSettings playback = {&GlobalStereo};
         playback.volume = 1.5f;
         PlayAudio(&Audio.FailSound, playback);
+        PlaybackSettings p2 = {&Ambience};
+        p2.volume = 2.f;
+        SchedulePlayback(&Audio.BearGrowl, p2, 3.25);
     }
     else
     {
-        Tile bearTile = TileAt(Bear.position);
-        // TODO: randomize times a bit?
-        //-> Would probably feel alot better
-        PlayFootstepAudio(bearTile.type, 1);
-        PlayFootstepAudio(bearTile.type, 1.18);
-        PlayFootstepAudio(bearTile.type, 1.4);
-        PlayFootstepAudio(bearTile.type, 1.62);
+        Tile newBearPosition = TileAt(Bear.position);
+
+        // TODO: these are tweaking values, these should live in a config file
+        //  -> because then i also could HOT RELOAD them !
+        float afterPlayerDelay = 1;
+        float stepBaseDelay = 0.35;
+
+        float decimal1 = stepBaseDelay + ((rand() % 8) - 4) / 100.;
+        float decimal2 = stepBaseDelay + ((rand() % 10) - 5) / 100.;
+        float decimal3 = stepBaseDelay + ((rand() % 12) - 6) / 100.;
+
+        float pan = GetPan(Player.position, Bear.position);
+
+        PlayFootstepAudio(newBearPosition.type, afterPlayerDelay, 1, pan);
+        PlayFootstepAudio(newBearPosition.type,
+                          afterPlayerDelay + decimal1,
+                          1,
+                          pan);
+        PlayFootstepAudio(newBearPosition.type,
+                          afterPlayerDelay + decimal1 + decimal2,
+                          0.85,
+                          pan);
+        PlayFootstepAudio(newBearPosition.type,
+                          afterPlayerDelay + decimal1 + decimal2 + decimal3,
+                          0.75,
+                          pan);
     }
 }

@@ -1,6 +1,31 @@
 #include "../internal.h"
 #include "../map.h"
 
+static unordered_map<string, TileType> FX_MAPPING = {
+                                        {"footstep-stone", STONE},
+                                        {"footstep-carpet", CARPET},
+                                        {"footstep-wood-hi", WOOD},
+                                        {"footsteps-grass", GRASS},
+                                        {"wall-bump", WALL},
+                                        {"chest-bump", CHEST},
+                                        {"door-bump", DOOR},
+                                        {"pillar-bump", PILLAR},
+                                        // TODO: I keep adding things that are
+                                        // not actually tiles
+                                        //  -> I have to find another solution
+                                        {"nope-sound", NOOP},
+                                        {"huh", HUH},
+                                        {"pocket-keys", POCKET},
+};
+
+static unordered_map<string, TileType> BEAR_FX_MAPPING = {
+                                        {"footsteps-bear-stone", STONE},
+                                        {"footsteps-bear-stone", CARPET},
+                                        {"footsteps-bear-wood", WOOD},
+                                        {"footsteps-bear-stone", GRASS}
+
+};
+
 // TODO: mapping audio files for multiple things?
 void AddMapping(string fileName, int index, FxInfo** lastInfo)
 {
@@ -95,6 +120,7 @@ void LoadStaticAudio()
     LoadOggAsPcm(Audio.LockIn, "res/amb/s_lock-in.ogg");
     LoadOggAsPcm(Audio.ObtainKeys, "res/amb/s_obtain-keys.ogg");
     LoadOggAsPcm(Audio.UnlockDoor, "res/amb/s_unlock-door.ogg");
+    LoadOggAsPcm(Audio.BearGrowl, "res/fx/s_bear-growl.ogg");
 
     // TODO: handle this via mapping might be better?
     LoadOggAsPcm(Audio.UiDown, "res/ui/s_whoosh-001.ogg");
