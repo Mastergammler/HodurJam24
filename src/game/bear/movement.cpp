@@ -197,6 +197,31 @@ void PlayFootstepAudio(TileType type, float delay, PlaybackSettings settings)
     }
 }
 
+float GetVolumeByDistance(v2 playerPosition,
+                          v2 bearPosition,
+                          float startingVolume = 1)
+{
+    v2 distanceVector = {bearPosition.x - playerPosition.x,
+                         playerPosition.y - bearPosition.y};
+
+    float distance = sqrt(pow(distanceVector.x, 2) + pow(distanceVector.y, 2));
+
+    // max volume
+    if (distance <= 0) return startingVolume;
+
+    // lower it for slower decrease
+    float decreaseFactor = 0.5;
+
+    float newVolume = startingVolume / pow(distance, decreaseFactor);
+
+    Logf("Volume is %.2f for distance %.2f (starting at %.2f)",
+         newVolume,
+         distance,
+         startingVolume);
+
+    return newVolume;
+}
+
 float GetPan(v2 playerPosition, v2 bearPosition)
 {
     // NOTE: Due to the top down perspective and the notion that NORTH is
@@ -332,21 +357,34 @@ void Bear_MoveTowardsPlayer()
 
         float pan = GetPan(Player.position, Bear.position);
         float lpRatio = GetLowpass(Player.position, Bear.position);
+        float footstepVolumeFactor = 1.15;
 
         PlaybackSettings s1 = {};
         s1.pan = pan;
         s1.lowpass_filter = lpRatio;
+        s1.volume = GetVolumeByDistance(Player.position,
+                                        Bear.position,
+                                        1 * footstepVolumeFactor);
+
         PlaybackSettings s2 = {};
         s2.pan = pan;
         s2.lowpass_filter = lpRatio;
+        s2.volume = GetVolumeByDistance(Player.position,
+                                        Bear.position,
+                                        1 * footstepVolumeFactor);
         PlaybackSettings s3 = {};
         s3.pan = pan;
         s3.lowpass_filter = lpRatio;
-        s3.volume = 0.85;
+        // TODO: more config file stuff etc
+        s3.volume = GetVolumeByDistance(Player.position,
+                                        Bear.position,
+                                        0.85 * footstepVolumeFactor);
         PlaybackSettings s4 = {};
         s4.pan = pan;
         s4.lowpass_filter = lpRatio;
-        s4.volume = 0.75;
+        s4.volume = GetVolumeByDistance(Player.position,
+                                        Bear.position,
+                                        0.75 * footstepVolumeFactor);
 
         PlayFootstepAudio(newBearPosition.type, afterPlayerDelay, s1);
         PlayFootstepAudio(newBearPosition.type,
