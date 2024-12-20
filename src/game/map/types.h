@@ -34,6 +34,20 @@ struct Map
     int rows;
     int columns;
     int total_tiles;
+
+    bool bear_present;
+    v2 bear_start;
+};
+
+struct Metadata
+{
+    string line;
+
+    char type;
+    int num1;
+    int num2;
+
+    bool valid;
 };
 
 struct LevelState

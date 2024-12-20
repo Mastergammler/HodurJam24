@@ -47,8 +47,16 @@ void LoadLevel(int level)
     Player.time_since_anim_start = 0;
     Player.inputs_locked = false;
 
-    // TODO: bear loading -> via map etc
-    Bear.position = {0, 0};
+    if (Level.map.bear_present)
+    {
+        Bear.position = Level.map.bear_start;
+        Bear.is_present = true;
+        Logf("Bear start position: (%i,%i)", Bear.position.x, Bear.position.y);
+    }
+    else
+    {
+        Bear.is_present = false;
+    }
 
     PlayNumberSound(level, 1.6);
     PlayAudio(&Audio.DangerSound, {&GlobalStereo});

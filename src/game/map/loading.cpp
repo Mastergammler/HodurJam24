@@ -4,6 +4,8 @@ const char* MAP_REL_DIR = "res/maps/";
 const char* MAP_EXT = ".map";
 const char COL_SEP = ' ';
 const char DATA_INDICATOR = ':';
+const char BEAR_POSITION = 'B';
+
 /**
  *  Wall can be anything, becaues it's the default, but this is for readability
  */
@@ -47,6 +49,28 @@ bool IsInteractable(TileType type)
     }
 }
 
+// TODO: not quite happy with the way i'm parsing this
+//  - still alot of unhandeled error cases
+Metadata ParseMetadata(string line)
+{
+    Metadata m = {line};
+    if (line.length() < 2) return m;
+
+    m.type = line[1];
+
+    int firstSep = line.find_first_of(COL_SEP);
+    int secondSep = line.find_first_of(COL_SEP, firstSep + 1);
+
+    if (firstSep != string::npos && secondSep != string::npos)
+    {
+        m.num1 = stoi(line.substr(firstSep + 1, secondSep - firstSep - 1));
+        m.num2 = stoi(line.substr(secondSep + 1));
+        m.valid = true;
+    }
+
+    return m;
+}
+
 Map ParseMap(vector<string> lines)
 {
     int maxCol = 0;
@@ -62,6 +86,7 @@ Map ParseMap(vector<string> lines)
     }
 
     vector<char> columnData;
+    vector<Metadata> rawMetadata;
     int rowCount = 0;
 
     for (int lIdx = 0; lIdx < lines.size(); lIdx++)
@@ -72,8 +97,12 @@ Map ParseMap(vector<string> lines)
 
         if (line.length() == 0) continue;
 
-        // TODO: parse data
-        if (line[0] == DATA_INDICATOR) continue;
+        if (line[0] == DATA_INDICATOR)
+        {
+            Metadata metadata = ParseMetadata(line);
+            rawMetadata.push_back(metadata);
+            continue;
+        }
 
         // columns are separated by one whitespace always!
         for (int c = 0; c < line.length(); c += 2)
@@ -103,6 +132,21 @@ Map ParseMap(vector<string> lines)
         currentTile->position = {curCol, curRow};
         currentTile->is_walkable = IsWalkable(currentTile->type);
         currentTile->is_interactable = IsInteractable(currentTile->type);
+    }
+
+    for (int i = 0; i < rawMetadata.size(); i++)
+    {
+        Metadata cur = rawMetadata[i];
+        if (!cur.valid)
+        {
+            Logf("Error during parsing metadata line %s", cur.line.c_str());
+            continue;
+        }
+        if (rawMetadata[i].type == BEAR_POSITION)
+        {
+            map.bear_present = true;
+            map.bear_start = {cur.num1, cur.num2};
+        }
     }
 
     return map;

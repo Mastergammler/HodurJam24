@@ -320,6 +320,8 @@ float GetLowpass(v2 playerPosition, v2 bearPosition)
 
 void Bear_MoveTowardsPlayer()
 {
+    if (!Bear.is_present) return;
+
     Clock pathClock = {};
     Measure_Start(pathClock);
     v2 direction = DetermineNextPosition(Bear.position, Player.position);
