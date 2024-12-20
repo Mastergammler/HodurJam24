@@ -1,7 +1,6 @@
 #include "../internal.h"
 #include "../map.h"
 #include <corecrt_math_defines.h>
-#include <winuser.h>
 
 /**
  * O(n = count)
@@ -184,10 +183,7 @@ v2 DetermineNextPosition(v2 startPosition, v2 targetPosition)
     return nextMove;
 }
 
-void PlayFootstepAudio(TileType type,
-                       float delay,
-                       float volume = 1,
-                       float pan = 0)
+void PlayFootstepAudio(TileType type, float delay, PlaybackSettings settings)
 {
     if (Audio.bear_fx_mapping.find(type) != Audio.bear_fx_mapping.end())
     {
@@ -195,33 +191,106 @@ void PlayFootstepAudio(TileType type,
         int idxOffset = rand() % fxInfo.count;
         AudioData* audio = &Audio.fx[fxInfo.start_idx + idxOffset];
 
-        PlaybackSettings playback = {&Bear.body};
-        playback.volume = volume;
-        playback.pan = pan;
+        settings.voice = &Bear.body;
 
-        SchedulePlayback(audio, playback, delay);
+        SchedulePlayback(audio, settings, delay);
     }
 }
 
 float GetPan(v2 playerPosition, v2 bearPosition)
 {
     // NOTE: Due to the top down perspective and the notion that NORTH is
-    // upwards
+    // upwards, the problem is, that world space and screen space are not the
+    // same or rother the world space from the map, is different from the world
+    // space of the player
+    //
     //  we have to switch left and right, because the player is in fact turned
     //  180 Deg relative to the map orientation (where y + 1 = downward)
     v2 distance = {bearPosition.x - playerPosition.x,
                    playerPosition.y - bearPosition.y};
 
-    double angleRad = atan2(distance.y, distance.x) - M_PI_2;
-    float pan = angleRad * 2 / M_PI;
+    // we're only looking at q1, but also rotate the coordinate system by 90 deg
+    // (by flipping x and y)
+    // NOTE: I thought it should have been x / y for 90 degree rotation,
+    // but apparently it still has to be y/x, not sure why
+    // but this sounds correct -> the thing that flips everything, is just the
+    // angle calculation
+    double alphaTrans = atan2(abs(distance.y), abs(distance.x));
+    // since we rotated by 90, we need to calculate
+    // the complementary angle instead
+    double alpha = M_PI_2 - alphaTrans;
+
+    // since we used the abs of the values (for only q1)
+    // we now need to actually hanlde left and right
+    if (distance.x < 0) alpha = -alpha;
+
+    float normalizedPan = alpha * 2 / M_PI;
 
     Logf("Pan for (%i,%i) :  %.2f - %.2f",
          distance.x,
          distance.y,
-         angleRad,
-         pan);
+         alpha,
+         normalizedPan);
 
-    return pan;
+    return normalizedPan;
+}
+
+double degreeToRadians(float angle)
+{
+    return angle * M_PI / 180;
+}
+
+double radiansToDegree(double radians)
+{
+    return radians * 180 / M_PI;
+}
+
+float GetLowpass(v2 playerPosition, v2 bearPosition)
+{
+    v2 distance = {bearPosition.x - playerPosition.x,
+                   playerPosition.y - bearPosition.y};
+
+    double alpha = atan2(abs(distance.y), abs(distance.x));
+    // double alpha = M_PI_2 - alphaTrans;
+
+    double alphaDegrees = radiansToDegree(alpha);
+
+    if (alphaDegrees >= Player.behind_cone_max_angle && distance.y < 0)
+    {
+        return Player.lp_max_ratio;
+    }
+    else if (alphaDegrees >= Player.behind_cone_angle && distance.y < 0)
+    {
+        // adding more of the low pass the closer to the back a sound is
+        float angleRange = Player.behind_cone_max_angle -
+                           Player.behind_cone_angle;
+
+        float addRange = alphaDegrees - Player.behind_cone_angle;
+        float toMaxPercentage = addRange / angleRange;
+        // TODO: whats high and low is flipped, it's confusing
+        float relativeRatio = Player.lp_start_ratio - Player.lp_max_ratio;
+
+        float ratioAdd = toMaxPercentage * relativeRatio;
+        float lpValue = Player.lp_start_ratio - ratioAdd;
+
+        if (lpValue < Player.lp_max_ratio)
+        {
+            Logf("Ratio is actually too low: %.2f", lpValue);
+        }
+        // - preventing audio errors just in case
+        if (lpValue < 0)
+        {
+            Logf("Fatal lp calculation error: value was below 0: %.2f",
+                 lpValue);
+            lpValue = 0;
+        }
+        return lpValue;
+    }
+
+    // TODO: make this clear what is lp on and off etc ...
+    // -> LP off should be value 0! -> zero as initalization
+    // default value, 0 lowpass
+    return 1;
 }
 
 void Bear_MoveTowardsPlayer()
@@ -262,19 +331,33 @@ void Bear_MoveTowardsPlayer()
         float decimal3 = stepBaseDelay + ((rand() % 12) - 6) / 100.;
 
         float pan = GetPan(Player.position, Bear.position);
+        float lpRatio = GetLowpass(Player.position, Bear.position);
 
-        PlayFootstepAudio(newBearPosition.type, afterPlayerDelay, 1, pan);
+        PlaybackSettings s1 = {};
+        s1.pan = pan;
+        s1.lowpass_filter = lpRatio;
+        PlaybackSettings s2 = {};
+        s2.pan = pan;
+        s2.lowpass_filter = lpRatio;
+        PlaybackSettings s3 = {};
+        s3.pan = pan;
+        s3.lowpass_filter = lpRatio;
+        s3.volume = 0.85;
+        PlaybackSettings s4 = {};
+        s4.pan = pan;
+        s4.lowpass_filter = lpRatio;
+        s4.volume = 0.75;
+
+        PlayFootstepAudio(newBearPosition.type, afterPlayerDelay, s1);
         PlayFootstepAudio(newBearPosition.type,
                           afterPlayerDelay + decimal1,
-                          1,
-                          pan);
+
+                          s2);
         PlayFootstepAudio(newBearPosition.type,
                           afterPlayerDelay + decimal1 + decimal2,
-                          0.85,
-                          pan);
+                          s3);
         PlayFootstepAudio(newBearPosition.type,
                           afterPlayerDelay + decimal1 + decimal2 + decimal3,
-                          0.75,
-                          pan);
+                          s4);
     }
 }

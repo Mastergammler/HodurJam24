@@ -36,22 +36,22 @@ void PlayFootstepAudio(TileType type, bool isFirst, v2 direction)
         if (isFirst && direction == NORTH)
         {
             playback.pan = -STEP_PAN;
-            playback.settings = &Player.left_foot;
+            playback.voice = &Player.left_foot;
         }
         else if ((isFirst && direction == EAST) ||
                  (isFirst && direction == SOUTH))
         {
-            playback.settings = &Player.right_foot;
+            playback.voice = &Player.right_foot;
             playback.pan = STEP_PAN;
         }
         else if (isFirst)
         {
             playback.pan = -STEP_PAN;
-            playback.settings = &Player.left_foot;
+            playback.voice = &Player.left_foot;
         }
         else
         {
-            playback.settings = &Player.right_foot;
+            playback.voice = &Player.right_foot;
             playback.pan = STEP_PAN;
         }
 
@@ -77,7 +77,7 @@ void PlayTileAudio(TileType type, v2 direction, float volume = 1)
         AudioData* audio = &Audio.fx[fxInfo.start_idx + idxOffset];
 
         PlaybackSettings playback = {};
-        playback.settings = &Player.body;
+        playback.voice = &Player.body;
         playback.volume = volume;
 
         if (direction == WEST)

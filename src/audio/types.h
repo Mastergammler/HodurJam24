@@ -49,7 +49,7 @@ struct VoiceSettings
 
 struct PlaybackSettings
 {
-    VoiceSettings* settings;
+    VoiceSettings* voice;
 
     /*
      * Usually we want to play the sound without letting the previous one finish

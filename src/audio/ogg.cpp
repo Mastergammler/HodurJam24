@@ -230,7 +230,7 @@ void StopAudio(VoiceSettings& settings)
 
 void PlayAudio(AudioData* audio, PlaybackSettings playback)
 {
-    if (!ValidatePlayback(audio, playback.settings)) return;
+    if (!ValidatePlayback(audio, playback.voice)) return;
 
     XAUDIO2_BUFFER audioBuffer = {};
     audioBuffer.pAudioData = audio->data;
@@ -241,7 +241,7 @@ void PlayAudio(AudioData* audio, PlaybackSettings playback)
         audioBuffer.LoopCount = XAUDIO2_LOOP_INFINITE;
     }
 
-    IXAudio2SourceVoice* voice = playback.settings->voice;
+    IXAudio2SourceVoice* voice = playback.voice->voice;
 
     HRESULT hr;
     if (playback.interrupt_previous)
@@ -264,8 +264,8 @@ void PlayAudio(AudioData* audio, PlaybackSettings playback)
              playback.volume,
              audio->file_name.c_str());
 
-    PanVoice(playback.settings, playback.pan);
-    ApplyLowpass(playback.settings, playback.lowpass_filter);
+    PanVoice(playback.voice, playback.pan);
+    ApplyLowpass(playback.voice, playback.lowpass_filter);
 
     hr = voice->Start();
     if (FAILED(hr))
