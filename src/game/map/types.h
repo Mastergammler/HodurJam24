@@ -1,4 +1,5 @@
 #include "../types.h"
+#include "../vector.h"
 
 struct Tile
 {
