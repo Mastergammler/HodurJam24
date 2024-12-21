@@ -34,7 +34,9 @@ void LoadLevel(int level)
     AudioQueue_ClearSchedule();
     Schedule_Clear();
 
-    string levelName = format("test0%i", level);
+    string fmt = "test%i";
+    if (level < 10) fmt = "test0%i";
+    string levelName = format(fmt, level);
 
     Level.level_name = levelName;
     Level.number = level;

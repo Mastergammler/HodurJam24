@@ -313,6 +313,48 @@ float GetLowpass(v2 playerPosition, v2 bearPosition)
     return 1;
 }
 
+void SetProximityLevel()
+{
+    // TODO: it looks like the proximity handling is something different
+    //  -> should maybe live somewhere else
+    //  Logf("Bear distance in steps: %i", Bear.distance_in_steps);
+    PlaybackSettings proximitySettings = {&Proximity, true, true};
+
+    v2 distance = Player.position - Bear.position;
+    v2 delta = {abs(distance.x), abs(distance.y)};
+
+    bool isDirectNeighbour = false;
+    bool isNextToDirect = false;
+
+    if (delta <= 1)
+        isDirectNeighbour = true;
+    else if (delta.x == 2 || delta.y == 2)
+        isNextToDirect = true;
+
+    // TODO: i think panning is not cool for the proximity
+    //  but i want some consistent bear sound that he makes
+    //  so the player has a ongoing orientation
+
+    // does not include corners 2/2 etc, because these are distance 4
+    // but all other 2s basically
+    if (isNextToDirect &&
+        (Bear.distance_in_steps == 2 || Bear.distance_in_steps == 3))
+    {
+        proximitySettings.volume = 0.55;
+    }
+    // includes the corners of 1/1 etc
+    else if (isDirectNeighbour &&
+             (Bear.distance_in_steps == 1 || Bear.distance_in_steps == 2))
+    {
+        proximitySettings.volume = 1;
+    }
+    else
+    {
+        proximitySettings.volume = 0;
+    }
+    UpdateCurrentPlayback(proximitySettings);
+}
+
 void Bear_MoveTowardsPlayer()
 {
     if (!Bear.is_present) return;
@@ -322,12 +364,27 @@ void Bear_MoveTowardsPlayer()
     v2 direction = DetermineNextPosition(Bear.position, Player.position);
     float elapsed = Measure_Elapsed(pathClock);
 
-    Bear.position = Bear.position + direction;
-    Logf("Next bear position is (%i,%i) - %i nodes -  %.3f ms",
-         Bear.position.x,
-         Bear.position.y,
-         Nodes.count,
-         elapsed);
+    TileType playerTile = TileAt(Player.position).type;
+    bool bearIsMoving = direction != INIT && playerTile != GRASS;
+
+    if (bearIsMoving)
+    {
+        Bear.position = Bear.position + direction;
+        Logf("Next bear position is (%i,%i) - %i nodes -  %.3f ms",
+             Bear.position.x,
+             Bear.position.y,
+             Nodes.count,
+             elapsed);
+    }
+    else
+    {
+        // bear didn't actually move, but the value is set by the alg,
+        // the the algorithm determines distance based on the just evaluated
+        // position
+        Bear.distance_in_steps += 1;
+    }
+
+    SetProximityLevel();
 
     if (Bear.position == Player.position)
     {
@@ -341,35 +398,12 @@ void Bear_MoveTowardsPlayer()
         p2.volume = 2.f;
         SchedulePlayback(&Audio.BearGrowl, p2, 3.25);
     }
-    else
+    else if (bearIsMoving)
     {
         Tile newBearPosition = TileAt(Bear.position);
 
         float pan = GetPan(Player.position, Bear.position);
         float lpRatio = GetLowpass(Player.position, Bear.position);
-
-        // Logf("Bear distance in steps: %i", Bear.distance_in_steps);
-        PlaybackSettings proximitySettings = {&Proximity, true, true};
-
-        // TODO: i think panning is not cool for the proximity
-        //  but i want some consistent bear sound that he makes
-        //  so the player has a ongoing orientation
-        if (Bear.distance_in_steps == 2)
-        {
-            proximitySettings.volume = 0.2;
-            // proximitySettings.pan = pan;
-        }
-        else if (Bear.distance_in_steps == 1)
-        {
-            // TODO: is that double it?
-            proximitySettings.volume = 0.5;
-            // proximitySettings.pan = pan;
-        }
-        else
-        {
-            proximitySettings.volume = 0;
-        }
-        UpdateCurrentPlayback(proximitySettings);
 
         // TODO: these are tweaking values, these should live in a config file
         //  -> because then i also could HOT RELOAD them !
