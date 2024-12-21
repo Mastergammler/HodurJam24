@@ -6,4 +6,6 @@ struct UiState
 
     int current_level;
     int level_count;
+
+    string* level_names;
 };

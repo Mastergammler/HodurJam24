@@ -152,19 +152,20 @@ Map ParseMap(vector<string> lines)
     return map;
 }
 
-Map LoadMap(string name)
+Map LoadMap(string fileName)
 {
     Clock fileClock = {};
     Measure_Start(fileClock);
 
-    bool validMap = true;
-    vector<string> lines = read_all_lines(MAP_REL_DIR + name + MAP_EXT);
+    vector<string> lines = read_all_lines(MAP_REL_DIR + fileName);
     Map map = ParseMap(lines);
 
     if (lines.size() > 0)
     {
         float time = Measure_Elapsed(fileClock);
-        Logf("Successfully loaded map %s within %.2fms", name.c_str(), time);
+        Logf("Successfully loaded map %s within %.2fms",
+             fileName.c_str(),
+             time);
     }
 
     return map;

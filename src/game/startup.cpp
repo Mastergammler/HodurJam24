@@ -68,6 +68,22 @@ void LoadAudio()
     CreateVoices();
 }
 
+void LoadMaps()
+{
+    vector<FileEntry> files = directory_files("res/maps");
+
+    Ui.level_names = new string[files.size()];
+    Ui.level_count = files.size();
+    Ui.current_level = 1;
+
+    for (int i = 0; i < files.size(); i++)
+    {
+        Ui.level_names[i] = files[i].file_name;
+    }
+
+    Logf("Detected %i level maps.", Ui.level_count);
+}
+
 void Game_Init(ExitCallback exitFunction)
 {
     ExitFunction = exitFunction;
@@ -75,12 +91,9 @@ void Game_Init(ExitCallback exitFunction)
     InitInputs();
     Audio_Init();
     LoadAudio();
+    LoadMaps();
 
     Schedule_Init(8);
-
-    // TEST: testing
-    Ui.current_level = 1;
-    Ui.level_count = 19;
 
     Log("Game initalized successfully");
 }

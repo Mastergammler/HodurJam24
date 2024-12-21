@@ -3,7 +3,7 @@
 void PlayNumberSound(int number, float delay)
 {
     // sound only go to 19
-    assert(number < 20);
+    assert(number > 0 && number < 20);
 
     int fifths = number / 5;
     int rest = number % 5;

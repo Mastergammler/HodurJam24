@@ -34,14 +34,12 @@ void LoadLevel(int level)
     AudioQueue_ClearSchedule();
     Schedule_Clear();
 
-    string fmt = "test%i";
-    if (level < 10) fmt = "test0%i";
-    string levelName = format(fmt, level);
+    int levelIdx = level - 1;
 
-    Level.level_name = levelName;
+    Level.level_name = Ui.level_names[levelIdx];
     Level.number = level;
     Level.player_has_key = false;
-    Level.map = LoadMap(levelName);
+    Level.map = LoadMap(Level.level_name);
 
     delete Nodes.items;
     Nodes.max_size = Level.map.total_tiles;
@@ -71,7 +69,7 @@ void LoadLevel(int level)
     PlayAudio(&Audio.DangerSound, {&GlobalStereo});
     PlayAudio(&Audio.LockIn, {&GlobalStereo, false});
     Logf("Loading level %s (%i tiles)",
-         levelName.c_str(),
+         Level.level_name.c_str(),
          Level.map.total_tiles);
 }
 

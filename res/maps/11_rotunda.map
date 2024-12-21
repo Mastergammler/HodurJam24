@@ -1,0 +1,18 @@
+:B 13 9 
+x x x x x x x x x x x x x x x
+x . . . . x x x x x . . . . x
+x . . . x           x . . . x
+x . . x   x x x x x   x . . x
+x . x   x . . . . . x   x . x
+x x   x . . . . . . . x   x x
+x x   x . . . . . . . x   x x
+x x   x . . . C . . . x   x x
+x x   x . . . _ . . . x   x x
+x x   x . . . _ . . . x   x x
+x . x   x . . _ . . x   x . x
+x . . x   x x _ x x   x . . x
+x . . . x     _     x . . . x
+x . . . . x x _ x x . . . . x
+x . . . . . . _ . . . . . . x
+x x x x x x x _ x x x x x x x
+              D

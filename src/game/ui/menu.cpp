@@ -1,4 +1,5 @@
 #include "../internal.h"
+#include "../systems.h"
 #include "../ui.h"
 
 void Ui_HandleInputs()
@@ -18,7 +19,8 @@ void Ui_HandleInputs()
 
     int levelTarget = Ui.current_level + offset;
 
-    if (levelTarget < 0 || levelTarget > Ui.level_count)
+    // 0 is not a valid level
+    if (levelTarget <= 0 || levelTarget > Ui.level_count)
     {
         if (Audio.fx_mapping.find(NOOP) != Audio.fx_mapping.end())
         {
@@ -30,7 +32,6 @@ void Ui_HandleInputs()
     }
     else
     {
-
         Ui.current_level += offset;
         // TODO: play whoosh via index or smth
         // -> this is super akward
@@ -52,10 +53,13 @@ void Ui_HandleInputs()
 void OnUiEnter()
 {
     Ui.is_active = true;
-    // TODO: stop all other audio (rather responsibility of game exit?)
+
+    AudioQueue_ClearSchedule();
+    Schedule_Clear();
 
     PlayAudio(&Audio.UiEnter, {&GlobalStereo});
     SchedulePlayback(&Audio.MenuAtmo, {&Ambience, true, true, 0.8}, 0.3);
+    PlayNumberSound(Ui.current_level, 0.3);
 }
 
 void OnUiExit()
