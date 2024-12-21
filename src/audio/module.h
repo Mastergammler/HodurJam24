@@ -16,6 +16,7 @@ void Audio_Update(float deltaTimeS);
 void LoadOggAsPcm(AudioData& audio, const string filePath);
 void CreateVoiceForAudio(AudioData* audio, VoiceSettings& settings);
 void PlayAudio(AudioData* audio, PlaybackSettings playback);
+void UpdateCurrentPlayback(PlaybackSettings playback);
 void SchedulePlayback(AudioData* audio,
                       PlaybackSettings settings,
                       float delayInS);

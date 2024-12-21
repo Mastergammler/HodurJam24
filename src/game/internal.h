@@ -31,7 +31,6 @@ static NodeList Nodes;
  * Stereo voice playback for non directional things
  */
 static VoiceSettings GlobalStereo;
-// TODO: workaround, do the bear growl single?
-static VoiceSettings GlobalStereo2;
+static VoiceSettings Proximity;
 static VoiceSettings GlobalMono;
 static VoiceSettings Ambience;

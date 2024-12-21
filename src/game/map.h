@@ -3,7 +3,6 @@
 
 #include "internal.h"
 #include "types.h"
-#include <unordered_map>
 
 #define NAMEOF(x) #x
 

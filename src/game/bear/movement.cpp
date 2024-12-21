@@ -1,6 +1,5 @@
 #include "../internal.h"
 #include "../map.h"
-#include <corecrt_math_defines.h>
 
 /**
  * O(n = count)
@@ -164,22 +163,18 @@ v2 DetermineNextPosition(v2 startPosition, v2 targetPosition)
         prevNode = *next;
     }
 
+    // we want to know the position, the bear has after the current move!
     if (noPathPossible) return INIT;
 
-    // p * listSize (p = path length)
     NodeItem* nextNode = &prevNode;
     while (nextNode && nextNode->g_value > 1)
     {
         nextNode = NextPathNode(nextNode);
     }
 
-    // TODO: proper proximity handling
-    if (nextNode->h_value == 1)
-    {
-        Log("Bear proximity aleart!!!");
-    }
-
     v2 nextMove = nextNode->position - startPosition;
+    Bear.distance_in_steps = prevNode.g_value - 1;
+
     return nextMove;
 }
 
@@ -214,10 +209,10 @@ float GetVolumeByDistance(v2 playerPosition,
 
     float newVolume = startingVolume / pow(distance, decreaseFactor);
 
-    Logf("Volume is %.2f for distance %.2f (starting at %.2f)",
+    /*Logf("Volume is %.2f for distance %.2f (starting at %.2f)",
          newVolume,
          distance,
-         startingVolume);
+         startingVolume);*/
 
     return newVolume;
 }
@@ -336,6 +331,8 @@ void Bear_MoveTowardsPlayer()
 
     if (Bear.position == Player.position)
     {
+        // TODO: with delay
+        StopAudio(Proximity);
         Player.inputs_locked = true;
         PlaybackSettings playback = {&GlobalStereo};
         playback.volume = 1.5f;
@@ -348,6 +345,32 @@ void Bear_MoveTowardsPlayer()
     {
         Tile newBearPosition = TileAt(Bear.position);
 
+        float pan = GetPan(Player.position, Bear.position);
+        float lpRatio = GetLowpass(Player.position, Bear.position);
+
+        // Logf("Bear distance in steps: %i", Bear.distance_in_steps);
+        PlaybackSettings proximitySettings = {&Proximity, true, true};
+
+        // TODO: i think panning is not cool for the proximity
+        //  but i want some consistent bear sound that he makes
+        //  so the player has a ongoing orientation
+        if (Bear.distance_in_steps == 2)
+        {
+            proximitySettings.volume = 0.2;
+            // proximitySettings.pan = pan;
+        }
+        else if (Bear.distance_in_steps == 1)
+        {
+            // TODO: is that double it?
+            proximitySettings.volume = 0.5;
+            // proximitySettings.pan = pan;
+        }
+        else
+        {
+            proximitySettings.volume = 0;
+        }
+        UpdateCurrentPlayback(proximitySettings);
+
         // TODO: these are tweaking values, these should live in a config file
         //  -> because then i also could HOT RELOAD them !
         float afterPlayerDelay = 1;
@@ -357,8 +380,6 @@ void Bear_MoveTowardsPlayer()
         float decimal2 = stepBaseDelay + ((rand() % 10) - 5) / 100.;
         float decimal3 = stepBaseDelay + ((rand() % 12) - 6) / 100.;
 
-        float pan = GetPan(Player.position, Bear.position);
-        float lpRatio = GetLowpass(Player.position, Bear.position);
         float footstepVolumeFactor = 1.15;
 
         PlaybackSettings s1 = {};

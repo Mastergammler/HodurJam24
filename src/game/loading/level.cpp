@@ -1,5 +1,6 @@
 #include "../internal.h"
 #include "../map.h"
+#include "../systems.h"
 #include "../ui.h"
 
 // TODO: Do i maybe want to specify the start position in the map?
@@ -29,6 +30,9 @@ void LoadLevel(int level)
 {
     OnUiExit();
     // TODO: stop all current audio?!
+    StopAudio(Proximity);
+    AudioQueue_ClearSchedule();
+    Schedule_Clear();
 
     string levelName = format("test0%i", level);
 
@@ -52,6 +56,9 @@ void LoadLevel(int level)
         Bear.position = Level.map.bear_start;
         Bear.is_present = true;
         Logf("Bear start position: (%i,%i)", Bear.position.x, Bear.position.y);
+
+        PlaybackSettings proximitySettings = {&Proximity, true, true, 0};
+        PlayAudio(&Audio.ProximityYellow, proximitySettings);
     }
     else
     {

@@ -228,6 +228,25 @@ void StopAudio(VoiceSettings& settings)
     }
 }
 
+void UpdateCurrentPlayback(PlaybackSettings playback)
+{
+    if (playback.voice == NULL)
+    {
+        Log("Voice settings are NULL. Can not update playback settings.");
+        return;
+    }
+
+    IXAudio2SourceVoice* voice = playback.voice->voice;
+    HRESULT hr;
+    hr = voice->SetVolume(playback.volume);
+    if (FAILED(hr))
+        Logf("Error setting volume to %.2f for running audio ",
+             playback.volume);
+
+    PanVoice(playback.voice, playback.pan);
+    ApplyLowpass(playback.voice, playback.lowpass_filter);
+}
+
 void PlayAudio(AudioData* audio, PlaybackSettings playback)
 {
     if (!ValidatePlayback(audio, playback.voice)) return;

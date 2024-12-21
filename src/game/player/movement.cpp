@@ -8,6 +8,7 @@
 const float STEP_PAN = 0.2;
 const float SEC_STEP_VOL = 0.42;
 const float STEP_BACK_LP_CO = 0.35;
+// 0 = 100% lp, 1 = 0% lp
 const float BACK_LP_CO = 0.45;
 const float BUMP_PAN = 0.65;
 
@@ -68,7 +69,10 @@ void PlayFootstepAudio(TileType type, bool isFirst, v2 direction)
     }
 }
 
-void PlayTileAudio(TileType type, v2 direction, float volume = 1)
+void PlayTileAudio(TileType type,
+                   v2 direction,
+                   float volume = 1,
+                   float delay = 0)
 {
     if (Audio.fx_mapping.find(type) != Audio.fx_mapping.end())
     {
@@ -92,7 +96,7 @@ void PlayTileAudio(TileType type, v2 direction, float volume = 1)
         {
             playback.lowpass_filter = BACK_LP_CO;
         }
-        PlayAudio(audio, playback);
+        SchedulePlayback(audio, playback, delay);
     }
 }
 
@@ -131,6 +135,10 @@ void ExecuteAction(TileType interactionType)
                 Level.player_has_key = true;
                 PlayAudio(&Audio.OpenChest, {&GlobalStereo});
                 PlayAudio(&Audio.ObtainKeys, {&GlobalStereo, false});
+                // NOTE: did decide not to move the bear for now
+                //-> this would lead to sound overlap & also doesn't feel good
+                //-> loosing 2 steps immediately is quite harsh especially
+                // because you mostly need to run into the chest to open it
             }
         }
         break;
@@ -143,6 +151,7 @@ void ExecuteAction(TileType interactionType)
                 PlayAudio(&Audio.UnlockDoor, {&GlobalStereo});
                 PlayAudio(&Audio.SuccessSound, {&GlobalStereo, false});
                 ScheduleExecution(10, LoadNextLevel);
+                StopAudio(Proximity);
             }
             else
             {
@@ -154,19 +163,23 @@ void ExecuteAction(TileType interactionType)
     }
 }
 
+void ExecuteInteraction()
+{
+    v2 lookPosition = Player.position + Player.orientation;
+    Tile forwardTile = TileAt(lookPosition);
+
+    if (forwardTile.is_interactable)
+    {
+        ExecuteAction(forwardTile.type);
+    }
+}
+
+// TODO: this is now more a handle inputs?
 void HandleActions()
 {
     if (GameInputs.Action.pressed)
     {
-        v2 lookPosition = Player.position + Player.orientation;
-        Tile forwardTile = TileAt(lookPosition);
-
-        // TODO: actually i need to check the objects state
-        //  -> becaues it's something specific most of the time
-        if (forwardTile.is_interactable)
-        {
-            ExecuteAction(forwardTile.type);
-        }
+        ExecuteInteraction();
     }
 }
 
@@ -196,15 +209,34 @@ void HandleMovement()
         PlayFootstepAudio(nextTile.type, true, direction);
         if (Level.player_has_key)
         {
+            float delay = 0;
+            if (nextTile.type == GRASS) delay = 0.125;
+
             // TODO: delay for grass sounds, because else it feels strange
-            PlayTileAudio(POCKET, INIT, 0.75);
+            PlayTileAudio(POCKET, INIT, 0.75, delay);
         }
 
-        Bear_MoveTowardsPlayer();
+        // kind of a workaround, not nice
+        if (nextTile.type != GRASS)
+        {
+            Bear_MoveTowardsPlayer();
+        }
     }
     else
     {
         Player.orientation = direction;
-        PlayTileAudio(nextTile.type, direction);
+        if (nextTile.type == DOOR && Level.player_has_key)
+        {
+            ExecuteInteraction();
+        }
+        else
+        {
+            PlayTileAudio(nextTile.type, direction);
+            if (Audio.fx_mapping.find(nextTile.type) != Audio.fx_mapping.end())
+            {
+                // If it makes a sound -> move bear
+                Bear_MoveTowardsPlayer();
+            }
+        }
     }
 }

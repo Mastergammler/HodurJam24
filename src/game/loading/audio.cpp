@@ -20,9 +20,9 @@ static unordered_map<string, TileType> FX_MAPPING = {
 
 static unordered_map<string, TileType> BEAR_FX_MAPPING = {
                                         {"footsteps-bear-stone", STONE},
-                                        {"footsteps-bear-stone", CARPET},
+                                        {"footsteps-bear-carpet", CARPET},
                                         {"footsteps-bear-wood", WOOD},
-                                        {"footsteps-bear-stone", GRASS}
+                                        {"footsteps-bear-grass", GRASS}
 
 };
 
@@ -121,6 +121,7 @@ void LoadStaticAudio()
     LoadOggAsPcm(Audio.ObtainKeys, "res/amb/s_obtain-keys.ogg");
     LoadOggAsPcm(Audio.UnlockDoor, "res/amb/s_unlock-door.ogg");
     LoadOggAsPcm(Audio.BearGrowl, "res/fx/s_bear-growl.ogg");
+    LoadOggAsPcm(Audio.ProximityYellow, "res/amb/s_proximity_code-yellow.ogg");
 
     // TODO: handle this via mapping might be better?
     LoadOggAsPcm(Audio.UiDown, "res/ui/s_whoosh-001.ogg");

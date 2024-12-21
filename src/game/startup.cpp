@@ -48,6 +48,7 @@ void CreateVoices()
     CreateVoiceForAudio(&Audio.fx[0], Bear.body);
     CreateVoiceForAudio(&Audio.DangerSound, GlobalStereo);
     CreateVoiceForAudio(&Audio.MenuAtmo, Ambience);
+    CreateVoiceForAudio(&Audio.ProximityYellow, Proximity);
     CreateVoiceForAudio(&Audio.ui[0], GlobalMono);
 }
 

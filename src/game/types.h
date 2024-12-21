@@ -113,6 +113,7 @@ struct LoadedAudio
     AudioData ObtainKeys;
     AudioData UnlockDoor;
     AudioData BearGrowl;
+    AudioData ProximityYellow;
 
     AudioData UiDown;
     AudioData UiUp;

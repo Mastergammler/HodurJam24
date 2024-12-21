@@ -9,16 +9,16 @@ const char BEAR_POSITION = 'B';
 /**
  *  Wall can be anything, becaues it's the default, but this is for readability
  */
-const char WALL_SYMBOL = '-';
+const char WALL_SYMBOL = '|';
 
 TileType ParseTileType(char c)
 {
     switch (toupper(c))
     {
-        case '0': return STONE;
-        case '1': return CARPET;
-        case '2': return WOOD;
-        case '3': return GRASS;
+        case '.': return STONE;
+        case 'X': return CARPET;
+        case '_': return WOOD;
+        case '#': return GRASS;
         case 'C': return CHEST;
         case 'D': return DOOR;
         case 'O': return PILLAR;

@@ -6,10 +6,13 @@ struct Bear
     bool is_present;
 
     v2 position;
-
     VoiceSettings body;
 
-    // TODO: do i need an orientation?
+    /**
+     * Distance in steps from the player
+     * The amount of steps the bear needs to make in ordder to reach the player
+     */
+    int distance_in_steps;
 };
 
 struct NodeItem
