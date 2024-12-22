@@ -70,7 +70,7 @@ NodeItem* SelectNextNode()
 
         if (!smallestItem || (cur->f_value < smallestItem->f_value) ||
             (cur->f_value == smallestItem->f_value &&
-             cur->h_value < smallestItem->h_value))
+             cur->g_value < smallestItem->g_value))
         {
             smallestItem = cur;
         }
@@ -256,11 +256,11 @@ float GetPan(v2 playerPosition, v2 bearPosition)
 
     float normalizedPan = alpha * 2 / M_PI;
 
-    Logf("Pan for (%i,%i) :  %.2f - %.2f",
+    /*Logf("Pan for (%i,%i) :  %.2f - %.2f",
          distance.x,
          distance.y,
          alpha,
-         normalizedPan);
+         normalizedPan);*/
 
     return normalizedPan;
 }
@@ -393,14 +393,31 @@ void Bear_MoveTowardsPlayer()
     if (direction == INIT)
     {
         Log("Bear is not moving ...");
+
+        for (int i = 0; i < Nodes.count; i++)
+        {
+            NodeItem* cur = &Nodes.items[i];
+            if (cur->is_closed)
+            {
+                Logf("C %i %i - %i + %i = %i",
+                     cur->position.x,
+                     cur->position.y,
+                     cur->g_value,
+                     cur->h_value,
+                     cur->f_value);
+            }
+        }
     }
 
     if (bearIsMoving)
     {
         Bear.position = Bear.position + direction;
-        Logf("Next bear position is (%i,%i) - %i nodes -  %.3f ms",
+        Logf("Next bear position is (%i,%i), moving towards (%i,%i) - %i nodes "
+             "-  %.3f ms",
              Bear.position.x,
              Bear.position.y,
+             Player.position.x,
+             Player.position.y,
              Nodes.count,
              elapsed);
     }
