@@ -26,7 +26,7 @@ void Game_Update()
         if (GameInputs.Reset.released) LoadLevel(Level.number);
         if (GameInputs.Exit.released)
         {
-            StopAudio(Proximity);
+            StopAudio(ProximityYellow);
             OnUiEnter();
             return;
         }

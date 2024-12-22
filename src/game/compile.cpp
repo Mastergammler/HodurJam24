@@ -1,6 +1,7 @@
 #include "startup.cpp"
 #include "update.cpp"
 
+#include "audio/directional.cpp"
 #include "bear/movement.cpp"
 #include "loading/audio.cpp"
 #include "loading/level.cpp"

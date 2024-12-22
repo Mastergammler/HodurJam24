@@ -105,16 +105,25 @@ struct FxInfo
 
 struct LoadedAudio
 {
-    AudioData OpenChest;
+    // Level Status
     AudioData DangerSound;
     AudioData SuccessSound;
     AudioData FailSound;
+    AudioData GameSuccessSound;
+
+    // Gamplay Info
+    AudioData OpenChest;
     AudioData LockIn;
     AudioData ObtainKeys;
     AudioData UnlockDoor;
-    AudioData BearGrowl;
-    AudioData ProximityYellow;
 
+    // Bear
+    AudioData BearGrowl;
+    AudioData BearBreathingLoop;
+    AudioData ProximityYellow;
+    AudioData ProximityRed;
+
+    // UI
     AudioData UiDown;
     AudioData UiUp;
     AudioData UiRight;

@@ -113,15 +113,20 @@ void LoadUiSounds()
 
 void LoadStaticAudio()
 {
-    LoadOggAsPcm(Audio.OpenChest, "res/amb/s_open-chest.ogg");
     LoadOggAsPcm(Audio.DangerSound, "res/amb/s_level-start.ogg");
     LoadOggAsPcm(Audio.SuccessSound, "res/amb/s_level-success.ogg");
     LoadOggAsPcm(Audio.FailSound, "res/amb/s_level-fail.ogg");
+    LoadOggAsPcm(Audio.GameSuccessSound, "res/amb/s_victory.ogg");
+
+    LoadOggAsPcm(Audio.OpenChest, "res/amb/s_open-chest.ogg");
     LoadOggAsPcm(Audio.LockIn, "res/amb/s_lock-in.ogg");
     LoadOggAsPcm(Audio.ObtainKeys, "res/amb/s_obtain-keys.ogg");
     LoadOggAsPcm(Audio.UnlockDoor, "res/amb/s_unlock-door.ogg");
     LoadOggAsPcm(Audio.BearGrowl, "res/fx/s_bear-growl.ogg");
+    LoadOggAsPcm(Audio.BearBreathingLoop, "res/fx/l_bear-breathing.ogg");
+    // TODO: rename to just proximity-yellow etc
     LoadOggAsPcm(Audio.ProximityYellow, "res/amb/s_proximity_code-yellow.ogg");
+    LoadOggAsPcm(Audio.ProximityRed, "res/amb/s_proximity_level-red.ogg");
 
     // TODO: handle this via mapping might be better?
     LoadOggAsPcm(Audio.UiDown, "res/ui/s_whoosh-001.ogg");

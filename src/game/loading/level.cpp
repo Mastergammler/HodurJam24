@@ -1,3 +1,4 @@
+#include "../audio.h"
 #include "../internal.h"
 #include "../map.h"
 #include "../systems.h"
@@ -30,7 +31,8 @@ void LoadLevel(int level)
 {
     OnUiExit();
     // TODO: stop all current audio?!
-    StopAudio(Proximity);
+    StopAudio(ProximityYellow);
+    StopAudio(ProximityRed);
     AudioQueue_ClearSchedule();
     Schedule_Clear();
 
@@ -57,27 +59,44 @@ void LoadLevel(int level)
         Bear.is_present = true;
         Logf("Bear start position: (%i,%i)", Bear.position.x, Bear.position.y);
 
-        PlaybackSettings proximitySettings = {&Proximity, true, true, 0};
-        PlayAudio(&Audio.ProximityYellow, proximitySettings);
+        // TODO: breathing should be hearable from the start ...
+        // - same for proximity ..., if the bear is there ...
+        PlayAudio(&Audio.ProximityYellow, {&ProximityYellow, true, true, 0});
+        PlayAudio(&Audio.ProximityRed, {&ProximityRed, true, true, 0});
+        PlayAudio(&Audio.BearBreathingLoop, {&Bear.breathing, true, true, 0});
     }
     else
     {
         Bear.is_present = false;
     }
 
+    v2 doorPos = PositionOf(DOOR);
+    v2 direction = doorPos - Player.position;
+
     PlayNumberSound(level, 1.6);
     PlayAudio(&Audio.DangerSound, {&GlobalStereo});
-    PlayAudio(&Audio.LockIn, {&GlobalStereo, false});
+    // TODO: this will modify also the other global sounds ...
+    PlaybackSettings directional = DirectionalAudio(direction);
+    directional.voice = &GlobalStereo;
+    directional.interrupt_previous = false;
+    PlayAudio(&Audio.LockIn, directional);
     Logf("Loading level %s (%i tiles)",
          Level.level_name.c_str(),
          Level.map.total_tiles);
+}
+
+void OnGameFinished()
+{
+    PlayAudio(&Audio.GameSuccessSound, {&GlobalStereo});
 }
 
 void LoadNextLevel()
 {
     if (Ui.current_level >= Ui.level_count)
     {
-        Logf("No next level available, last level is %i", Ui.current_level);
+        Logf("No next level available, last level is %i, player beat the game.",
+             Ui.current_level);
+        OnGameFinished();
         return;
     }
 

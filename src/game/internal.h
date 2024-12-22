@@ -31,6 +31,7 @@ static NodeList Nodes;
  * Stereo voice playback for non directional things
  */
 static VoiceSettings GlobalStereo;
-static VoiceSettings Proximity;
+static VoiceSettings ProximityYellow;
+static VoiceSettings ProximityRed;
 static VoiceSettings GlobalMono;
 static VoiceSettings Ambience;

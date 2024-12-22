@@ -1,6 +1,9 @@
 #include "../internal.h"
 #include "../map.h"
 
+const float BREATHING_BASE_VOLUME = 1.1;
+const float BREATHING_FALLOFF_VALUE = 1.5;
+
 /**
  * O(n = count)
  */
@@ -164,7 +167,15 @@ v2 DetermineNextPosition(v2 startPosition, v2 targetPosition)
     }
 
     // we want to know the position, the bear has after the current move!
-    if (noPathPossible) return INIT;
+    if (noPathPossible)
+    {
+        Logf("ERROR: No path found from (%i,%i) towards (%i,%i)",
+             startPosition.x,
+             startPosition.y,
+             targetPosition.x,
+             targetPosition.y);
+        return INIT;
+    }
 
     NodeItem* nextNode = &prevNode;
     while (nextNode && nextNode->g_value > 1)
@@ -172,6 +183,7 @@ v2 DetermineNextPosition(v2 startPosition, v2 targetPosition)
         nextNode = NextPathNode(nextNode);
     }
 
+    // FIXME: error here? One node is the start position for some reason???
     v2 nextMove = nextNode->position - startPosition;
     Bear.distance_in_steps = prevNode.g_value - 1;
 
@@ -194,7 +206,8 @@ void PlayFootstepAudio(TileType type, float delay, PlaybackSettings settings)
 
 float GetVolumeByDistance(v2 playerPosition,
                           v2 bearPosition,
-                          float startingVolume = 1)
+                          float startingVolume = 1,
+                          float falloffFactor = 0.75)
 {
     v2 distanceVector = {bearPosition.x - playerPosition.x,
                          playerPosition.y - bearPosition.y};
@@ -204,10 +217,7 @@ float GetVolumeByDistance(v2 playerPosition,
     // max volume
     if (distance <= 0) return startingVolume;
 
-    // lower it for slower decrease
-    float decreaseFactor = 0.5;
-
-    float newVolume = startingVolume / pow(distance, decreaseFactor);
+    float newVolume = startingVolume / pow(distance, falloffFactor);
 
     /*Logf("Volume is %.2f for distance %.2f (starting at %.2f)",
          newVolume,
@@ -313,12 +323,20 @@ float GetLowpass(v2 playerPosition, v2 bearPosition)
     return 1;
 }
 
-void SetProximityLevel()
+// TODO: refactor, this now does multiple things ....
+// and the params are only for the breathing ...
+// -> This is super akward
+void SetProximityLevels(float pan, float lpRatio, float volume)
 {
     // TODO: it looks like the proximity handling is something different
     //  -> should maybe live somewhere else
     //  Logf("Bear distance in steps: %i", Bear.distance_in_steps);
-    PlaybackSettings proximitySettings = {&Proximity, true, true};
+    PlaybackSettings codeYellow = {&ProximityYellow, true, true};
+    PlaybackSettings codeRed = {&ProximityRed, true, true};
+    PlaybackSettings breathing = {&Bear.breathing};
+    breathing.pan = pan;
+    breathing.lowpass_filter = lpRatio;
+    breathing.volume = volume;
 
     v2 distance = Player.position - Bear.position;
     v2 delta = {abs(distance.x), abs(distance.y)};
@@ -340,19 +358,24 @@ void SetProximityLevel()
     if (isNextToDirect &&
         (Bear.distance_in_steps == 2 || Bear.distance_in_steps == 3))
     {
-        proximitySettings.volume = 0.55;
+        codeYellow.volume = 0.55;
+        codeRed.volume = 0;
     }
     // includes the corners of 1/1 etc
     else if (isDirectNeighbour &&
              (Bear.distance_in_steps == 1 || Bear.distance_in_steps == 2))
     {
-        proximitySettings.volume = 1;
+        codeYellow.volume = 0.55;
+        codeRed.volume = 0.55;
     }
     else
     {
-        proximitySettings.volume = 0;
+        codeYellow.volume = 0;
+        codeRed.volume = 0;
     }
-    UpdateCurrentPlayback(proximitySettings);
+    UpdateCurrentPlayback(codeYellow);
+    UpdateCurrentPlayback(codeRed);
+    UpdateCurrentPlayback(breathing);
 }
 
 void Bear_MoveTowardsPlayer()
@@ -366,6 +389,11 @@ void Bear_MoveTowardsPlayer()
 
     TileType playerTile = TileAt(Player.position).type;
     bool bearIsMoving = direction != INIT && playerTile != GRASS;
+
+    if (direction == INIT)
+    {
+        Log("Bear is not moving ...");
+    }
 
     if (bearIsMoving)
     {
@@ -384,12 +412,20 @@ void Bear_MoveTowardsPlayer()
         Bear.distance_in_steps += 1;
     }
 
-    SetProximityLevel();
+    float pan = GetPan(Player.position, Bear.position);
+    float lpRatio = GetLowpass(Player.position, Bear.position);
+    float volume = GetVolumeByDistance(Player.position,
+                                       Bear.position,
+                                       BREATHING_BASE_VOLUME,
+                                       BREATHING_FALLOFF_VALUE);
+    SetProximityLevels(pan, lpRatio, volume);
 
     if (Bear.position == Player.position)
     {
         // TODO: with delay
-        StopAudio(Proximity);
+        StopAudio(ProximityYellow);
+        StopAudio(ProximityRed);
+        StopAudio(Bear.breathing);
         Player.inputs_locked = true;
         PlaybackSettings playback = {&GlobalStereo};
         playback.volume = 1.5f;
@@ -401,9 +437,6 @@ void Bear_MoveTowardsPlayer()
     else if (bearIsMoving)
     {
         Tile newBearPosition = TileAt(Bear.position);
-
-        float pan = GetPan(Player.position, Bear.position);
-        float lpRatio = GetLowpass(Player.position, Bear.position);
 
         // TODO: these are tweaking values, these should live in a config file
         //  -> because then i also could HOT RELOAD them !

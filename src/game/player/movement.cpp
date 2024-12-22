@@ -1,3 +1,4 @@
+#include "../audio.h"
 #include "../bear.h"
 #include "../internal.h"
 #include "../loading.h"
@@ -8,10 +9,6 @@
 const float STEP_PAN = 0.2;
 const float SEC_STEP_VOL = 0.42;
 const float STEP_BACK_LP_CO = 0.35;
-// 0 = 100% lp, 1 = 0% lp
-const float BACK_LP_CO = 0.45;
-const float BUMP_PAN = 0.65;
-
 const float STEP_ANIM_TIME = .45f;
 
 v2 GetMovementDirection()
@@ -80,22 +77,9 @@ void PlayTileAudio(TileType type,
         int idxOffset = rand() % fxInfo.count;
         AudioData* audio = &Audio.fx[fxInfo.start_idx + idxOffset];
 
-        PlaybackSettings playback = {};
+        PlaybackSettings playback = DirectionalAudio(direction);
         playback.voice = &Player.body;
         playback.volume = volume;
-
-        if (direction == WEST)
-        {
-            playback.pan = -BUMP_PAN;
-        }
-        else if (direction == EAST)
-        {
-            playback.pan = BUMP_PAN;
-        }
-        else if (direction == SOUTH)
-        {
-            playback.lowpass_filter = BACK_LP_CO;
-        }
         SchedulePlayback(audio, playback, delay);
     }
 }
@@ -147,11 +131,14 @@ void ExecuteAction(TileType interactionType)
         {
             if (Level.player_has_key)
             {
+                // TODO: should be some kind of event system thingy
                 Player.inputs_locked = true;
                 PlayAudio(&Audio.UnlockDoor, {&GlobalStereo});
                 PlayAudio(&Audio.SuccessSound, {&GlobalStereo, false});
                 ScheduleExecution(10, LoadNextLevel);
-                StopAudio(Proximity);
+                StopAudio(ProximityYellow);
+                StopAudio(ProximityRed);
+                StopAudio(Bear.breathing);
             }
             else
             {

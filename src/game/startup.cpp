@@ -46,10 +46,12 @@ void CreateVoices()
     CreateVoiceForAudio(&Audio.fx[0], Player.right_foot);
     CreateVoiceForAudio(&Audio.fx[0], Player.body);
     CreateVoiceForAudio(&Audio.fx[0], Bear.body);
+    CreateVoiceForAudio(&Audio.fx[0], Bear.breathing);
+    CreateVoiceForAudio(&Audio.ui[0], GlobalMono);
     CreateVoiceForAudio(&Audio.DangerSound, GlobalStereo);
     CreateVoiceForAudio(&Audio.MenuAtmo, Ambience);
-    CreateVoiceForAudio(&Audio.ProximityYellow, Proximity);
-    CreateVoiceForAudio(&Audio.ui[0], GlobalMono);
+    CreateVoiceForAudio(&Audio.ProximityYellow, ProximityYellow);
+    CreateVoiceForAudio(&Audio.ProximityRed, ProximityRed);
 }
 
 // PERF: load most of it in the bg else loading might be quite long
