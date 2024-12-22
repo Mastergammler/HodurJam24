@@ -1,5 +1,6 @@
 #include "../audio.h"
 #include "../bear.h"
+#include "../events.h"
 #include "../internal.h"
 #include "../loading.h"
 #include "../map.h"
@@ -131,14 +132,7 @@ void ExecuteAction(TileType interactionType)
         {
             if (Level.player_has_key)
             {
-                // TODO: should be some kind of event system thingy
-                Player.inputs_locked = true;
-                PlayAudio(&Audio.UnlockDoor, {&GlobalStereo});
-                PlayAudio(&Audio.SuccessSound, {&GlobalStereo, false});
-                ScheduleExecution(10, LoadNextLevel);
-                StopAudio(ProximityYellow);
-                StopAudio(ProximityRed);
-                StopAudio(Bear.breathing);
+                Event_LevelVictory();
             }
             else
             {

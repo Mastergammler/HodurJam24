@@ -3,6 +3,7 @@
 
 #include "audio/directional.cpp"
 #include "bear/movement.cpp"
+#include "events/events.cpp"
 #include "loading/audio.cpp"
 #include "loading/level.cpp"
 #include "map/loading.cpp"

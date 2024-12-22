@@ -1,3 +1,4 @@
+#include "../events.h"
 #include "../internal.h"
 #include "../map.h"
 
@@ -439,17 +440,7 @@ void Bear_MoveTowardsPlayer()
 
     if (Bear.position == Player.position)
     {
-        // TODO: with delay
-        StopAudio(ProximityYellow);
-        StopAudio(ProximityRed);
-        StopAudio(Bear.breathing);
-        Player.inputs_locked = true;
-        PlaybackSettings playback = {&GlobalStereo};
-        playback.volume = 1.5f;
-        PlayAudio(&Audio.FailSound, playback);
-        PlaybackSettings p2 = {&Ambience};
-        p2.volume = 2.f;
-        SchedulePlayback(&Audio.BearGrowl, p2, 3.25);
+        Event_LevelFailure();
     }
     else if (bearIsMoving)
     {

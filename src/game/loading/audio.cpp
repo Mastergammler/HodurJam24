@@ -135,4 +135,11 @@ void LoadStaticAudio()
     LoadOggAsPcm(Audio.UiLeft, "res/ui/s_whoosh-004.ogg");
     LoadOggAsPcm(Audio.UiEnter, "res/ui/s_big-whoosh.ogg");
     LoadOggAsPcm(Audio.MenuAtmo, "res/amb/s_menu-ambience.ogg");
+
+    LoadOggAsPcm(Audio.HelpInfo, "res/voice/help-info.ogg");
+    LoadOggAsPcm(Audio.HelpMenu, "res/voice/help-menu.ogg");
+    LoadOggAsPcm(Audio.HelpGame, "res/voice/help-game.ogg");
+    LoadOggAsPcm(Audio.Intro, "res/voice/find-chest.ogg");
+    LoadOggAsPcm(Audio.ThereIsABear, "res/voice/avoid-bear.ogg");
+    LoadOggAsPcm(Audio.Victory, "res/voice/victory.ogg");
 }

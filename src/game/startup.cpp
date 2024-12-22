@@ -1,3 +1,4 @@
+#include "events.h"
 #include "internal.h"
 #include "loading.h"
 #include "map.h"
@@ -26,8 +27,7 @@ void InitInputs()
     GameInputs.Debug.identifier = TrimToVariableName(NAMEOF(GameInputs.Debug));
     GameInputs.Mixer.identifier = TrimToVariableName(NAMEOF(GameInputs.Mixer));
     GameInputs.Fire.identifier = TrimToVariableName(NAMEOF(GameInputs.Fire));
-    GameInputs.Manual.identifier = TrimToVariableName(
-                                            NAMEOF(GameInputs.Manual));
+    GameInputs.Help.identifier = TrimToVariableName(NAMEOF(GameInputs.Help));
     GameInputs.Reset.identifier = TrimToVariableName(NAMEOF(GameInputs.Reset));
     GameInputs.F1.identifier = TrimToVariableName(NAMEOF(GameInputs.F1));
     GameInputs.F2.identifier = TrimToVariableName(NAMEOF(GameInputs.F2));
@@ -52,6 +52,7 @@ void CreateVoices()
     CreateVoiceForAudio(&Audio.MenuAtmo, Ambience);
     CreateVoiceForAudio(&Audio.ProximityYellow, ProximityYellow);
     CreateVoiceForAudio(&Audio.ProximityRed, ProximityRed);
+    CreateVoiceForAudio(&Audio.Victory, Voiceline);
 }
 
 // PERF: load most of it in the bg else loading might be quite long
@@ -96,6 +97,7 @@ void Game_Init(ExitCallback exitFunction)
     LoadMaps();
 
     Schedule_Init(8);
+    Event_GameStart();
 
     Log("Game initalized successfully");
 }

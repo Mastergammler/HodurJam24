@@ -59,7 +59,7 @@ void OnUiEnter()
 
     PlayAudio(&Audio.UiEnter, {&GlobalStereo});
     SchedulePlayback(&Audio.MenuAtmo, {&Ambience, true, true, 0.8}, 0.3);
-    PlayNumberSound(Ui.current_level, 0.3);
+    PlayNumberSound(Ui.current_level, 0.85);
 }
 
 void OnUiExit()
@@ -69,6 +69,6 @@ void OnUiExit()
     // this needs to happen before the level loads!
     AudioQueue_ClearSchedule();
     StopAudio(Ambience);
-    StopAudio(GlobalMono);
+    StopAudio(GlobalMono); // number sounds
     StopAudio(GlobalStereo);
 }

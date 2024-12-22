@@ -35,7 +35,7 @@ struct Map
     int columns;
     int total_tiles;
 
-    bool bear_present;
+    bool bear_present = false;
     v2 bear_start;
 };
 
@@ -58,4 +58,7 @@ struct LevelState
 
     Map map = {0, 0};
     Tile current_tile = {WALL, {-1, -1}, false};
+
+    bool intro_played;
+    bool bear_info_played;
 };

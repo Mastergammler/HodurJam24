@@ -35,3 +35,4 @@ static VoiceSettings ProximityYellow;
 static VoiceSettings ProximityRed;
 static VoiceSettings GlobalMono;
 static VoiceSettings Ambience;
+static VoiceSettings Voiceline;

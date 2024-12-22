@@ -10,7 +10,7 @@ struct HodurInputState : InputState
           MoveBackward(key_states[3]), MoveLeft(key_states[4]),
           MoveRight(key_states[5]), TurnLeft(key_states[6]),
           TurnRight(key_states[7]), Log(key_states[8]), Debug(key_states[9]),
-          Mixer(key_states[10]), Fire(key_states[11]), Manual(key_states[12]),
+          Mixer(key_states[10]), Fire(key_states[11]), Help(key_states[12]),
           Reset(key_states[13]), F1(key_states[14]), F2(key_states[15]),
           F3(key_states[16]), F4(key_states[17])
     {
@@ -28,7 +28,7 @@ struct HodurInputState : InputState
     KeyInput& Debug;
     KeyInput& Mixer;
     KeyInput& Fire;
-    KeyInput& Manual;
+    KeyInput& Help;
     KeyInput& Reset;
     KeyInput& F1;
     KeyInput& F2;
@@ -130,6 +130,14 @@ struct LoadedAudio
     AudioData UiLeft;
     AudioData UiEnter;
     AudioData MenuAtmo;
+
+    // Voice
+    AudioData HelpInfo;
+    AudioData HelpMenu;
+    AudioData HelpGame;
+    AudioData Intro;
+    AudioData ThereIsABear;
+    AudioData Victory;
 
     AudioData* fx;
     int fx_count;

@@ -1,4 +1,5 @@
 #include "../audio.h"
+#include "../events.h"
 #include "../internal.h"
 #include "../map.h"
 #include "../systems.h"
@@ -31,10 +32,6 @@ void LoadLevel(int level)
 {
     OnUiExit();
     // TODO: stop all current audio?!
-    StopAudio(ProximityYellow);
-    StopAudio(ProximityRed);
-    AudioQueue_ClearSchedule();
-    Schedule_Clear();
 
     int levelIdx = level - 1;
 
@@ -51,7 +48,6 @@ void LoadLevel(int level)
     Player.position = DeterminePlayerStart();
     Player.in_walk_anim = false;
     Player.time_since_anim_start = 0;
-    Player.inputs_locked = false;
 
     if (Level.map.bear_present)
     {
@@ -70,24 +66,11 @@ void LoadLevel(int level)
         Bear.is_present = false;
     }
 
-    v2 doorPos = PositionOf(DOOR);
-    v2 direction = doorPos - Player.position;
-
-    PlayNumberSound(level, 1.6);
-    PlayAudio(&Audio.DangerSound, {&GlobalStereo});
-    // TODO: this will modify also the other global sounds ...
-    PlaybackSettings directional = DirectionalAudio(direction);
-    directional.voice = &GlobalStereo;
-    directional.interrupt_previous = false;
-    PlayAudio(&Audio.LockIn, directional);
     Logf("Loading level %s (%i tiles)",
          Level.level_name.c_str(),
          Level.map.total_tiles);
-}
 
-void OnGameFinished()
-{
-    PlayAudio(&Audio.GameSuccessSound, {&GlobalStereo});
+    Event_LevelStart();
 }
 
 void LoadNextLevel()
@@ -96,7 +79,7 @@ void LoadNextLevel()
     {
         Logf("No next level available, last level is %i, player beat the game.",
              Ui.current_level);
-        OnGameFinished();
+        Event_GameVictory();
         return;
     }
 
