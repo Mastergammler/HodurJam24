@@ -190,7 +190,6 @@ v2 DetermineNextPosition(v2 startPosition, v2 targetPosition)
         nextNode = NextPathNode(nextNode);
     }
 
-    // FIXME: error here? One node is the start position for some reason???
     v2 nextMove = nextNode->position - startPosition;
     Bear.distance_in_steps = prevNode.g_value - 1;
 
@@ -406,7 +405,12 @@ void Debug_LogClosedNodes(v2 direction)
         }
     }
 }
-void Bear_MoveTowardsPlayer()
+
+/*
+ * The 'moveBear' gives possibility of doing a dry run, for setting the audio
+ * levels at startup
+ */
+void Bear_MoveTowardsPlayer(bool moveBear = true)
 {
     if (!Bear.is_present) return;
 
@@ -416,14 +420,14 @@ void Bear_MoveTowardsPlayer()
     float elapsed = Measure_Elapsed(pathClock);
 
     TileType playerTile = TileAt(Player.position).type;
-    bool bearIsMoving = direction != INIT && playerTile != GRASS;
+    bool bearIsMoving = direction != INIT && playerTile != GRASS && moveBear;
 
     Debug_LogClosedNodes(direction);
 
     if (bearIsMoving)
     {
         Bear.position = Bear.position + direction;
-        Logf("Next bear position is (%i,%i), moving towards (%i,%i) - %i nodes "
+        Logf("New bear position is (%i,%i), moving towards (%i,%i) - %i nodes "
              "-  %.3f ms",
              Bear.position.x,
              Bear.position.y,

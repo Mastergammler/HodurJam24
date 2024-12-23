@@ -1,3 +1,4 @@
+#include "../events.h"
 #include "../internal.h"
 #include "../systems.h"
 #include "../ui.h"
@@ -54,8 +55,7 @@ void OnUiEnter()
 {
     Ui.is_active = true;
 
-    AudioQueue_ClearSchedule();
-    Schedule_Clear();
+    Event_ClearGameAudio();
 
     PlayAudio(&Audio.UiEnter, {&GlobalStereo});
     SchedulePlayback(&Audio.MenuAtmo, {&Ambience, true, true, 0.8}, 0.3);

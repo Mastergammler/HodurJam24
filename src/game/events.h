@@ -4,3 +4,4 @@ void Event_LevelVictory();
 void Event_LevelFailure();
 void Event_GameVictory();
 void Event_ResetLevel();
+void Event_ClearGameAudio();

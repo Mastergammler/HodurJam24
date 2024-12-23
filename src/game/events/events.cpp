@@ -1,10 +1,12 @@
 #include "../audio.h"
+#include "../bear.h"
 #include "../internal.h"
 #include "../loading.h"
 #include "../map.h"
 #include "../systems.h"
 #include "../ui.h"
 
+// TODO: fix this, just detect the first bear level
 const int FIRST_LEVEL = 1;
 const int FIRST_BEAR_LEVEL = 10;
 
@@ -24,6 +26,21 @@ void Event_GameStart()
 void UnlockPlayer()
 {
     Player.inputs_locked = false;
+}
+
+void SetBearAudioLevels()
+{
+    Bear_MoveTowardsPlayer(false);
+}
+
+void Event_ClearGameAudio()
+{
+    StopAudio(ProximityYellow);
+    StopAudio(ProximityRed);
+    StopAudio(Bear.breathing);
+
+    AudioQueue_ClearSchedule();
+    Schedule_Clear();
 }
 
 void Event_LevelStart()
@@ -58,43 +75,33 @@ void Event_LevelStart()
         Level.bear_info_played = true;
     }
 
-    // FIXME: not working on startup
     ScheduleExecution(audioDelay, UnlockPlayer);
+    ScheduleExecution(audioDelay, SetBearAudioLevels);
     SchedulePlayback(&Audio.DangerSound, {&GlobalStereo}, audioDelay);
     PlayNumberSound(Ui.current_level, audioDelay + .65);
 }
 
 void Event_LevelVictory()
 {
+    Event_ClearGameAudio();
+
     Player.inputs_locked = true;
     PlayAudio(&Audio.UnlockDoor, {&GlobalStereo});
     PlayAudio(&Audio.SuccessSound, {&GlobalStereo, false});
-    ScheduleExecution(10, LoadNextLevel);
-    StopAudio(ProximityYellow);
-    StopAudio(ProximityRed);
-    StopAudio(Bear.breathing);
+    float waitTime = Audio.UnlockDoor.length_in_s +
+                     Audio.SuccessSound.length_in_s;
+    ScheduleExecution(waitTime, LoadNextLevel);
 }
 
 void Event_ResetLevel()
 {
-    StopAudio(ProximityYellow);
-    StopAudio(ProximityRed);
-    StopAudio(Bear.breathing);
-
-    AudioQueue_ClearSchedule();
-    Schedule_Clear();
-
+    Event_ClearGameAudio();
     LoadLevel(Ui.current_level);
 }
 
 void Event_LevelFailure()
 {
-    StopAudio(ProximityYellow);
-    StopAudio(ProximityRed);
-    StopAudio(Bear.breathing);
-
-    AudioQueue_ClearSchedule();
-    Schedule_Clear();
+    Event_ClearGameAudio();
 
     Player.inputs_locked = true;
     PlaybackSettings playback = {&GlobalStereo};
