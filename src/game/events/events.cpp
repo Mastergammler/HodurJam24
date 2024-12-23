@@ -24,7 +24,6 @@ void Event_GameStart()
 void UnlockPlayer()
 {
     Player.inputs_locked = false;
-    Log("Ulocking player");
 }
 
 void Event_LevelStart()
@@ -90,9 +89,6 @@ void Event_ResetLevel()
 
 void Event_LevelFailure()
 {
-    // TODO: actually the bear footsteps should play here if the bear still
-    // moves ...
-
     StopAudio(ProximityYellow);
     StopAudio(ProximityRed);
     StopAudio(Bear.breathing);

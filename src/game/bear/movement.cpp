@@ -1,9 +1,15 @@
 #include "../events.h"
 #include "../internal.h"
 #include "../map.h"
+#include "../systems.h"
 
+// TODO: these are tweaking values, these should live in a config file
+//  -> because then i also could HOT RELOAD them !
 const float BREATHING_BASE_VOLUME = 1.1;
 const float BREATHING_FALLOFF_VALUE = 1.5;
+const float AFTER_PLAYER_DELAY = 1;
+const float FOOTSTEP_BASE_DELAY = 0.35;
+const float FOOTSTEP_VOLUME_FACTOR = 1.5;
 
 /**
  * O(n = count)
@@ -230,6 +236,8 @@ float GetVolumeByDistance(v2 playerPosition,
 
 float GetPan(v2 playerPosition, v2 bearPosition)
 {
+    if (playerPosition == bearPosition) return 0;
+
     // NOTE: Due to the top down perspective and the notion that NORTH is
     // upwards, the problem is, that world space and screen space are not the
     // same or rother the world space from the map, is different from the world
@@ -350,10 +358,6 @@ void SetProximityLevels(float pan, float lpRatio, float volume)
     else if (delta.x == 2 || delta.y == 2)
         isNextToDirect = true;
 
-    // TODO: i think panning is not cool for the proximity
-    //  but i want some consistent bear sound that he makes
-    //  so the player has a ongoing orientation
-
     // does not include corners 2/2 etc, because these are distance 4
     // but all other 2s basically
     if (isNextToDirect &&
@@ -379,21 +383,13 @@ void SetProximityLevels(float pan, float lpRatio, float volume)
     UpdateCurrentPlayback(breathing);
 }
 
-void Bear_MoveTowardsPlayer()
+void Debug_LogClosedNodes(v2 direction)
 {
-    if (!Bear.is_present) return;
-
-    Clock pathClock = {};
-    Measure_Start(pathClock);
-    v2 direction = DetermineNextPosition(Bear.position, Player.position);
-    float elapsed = Measure_Elapsed(pathClock);
-
-    TileType playerTile = TileAt(Player.position).type;
-    bool bearIsMoving = direction != INIT && playerTile != GRASS;
-
+    // TODO: IF DEBUG
     if (direction == INIT)
     {
-        Log("Bear is not moving ...");
+        // this should never happen, unless the bear is trapped somewhere
+        Log("Warning: Bear is not moving ...");
 
         for (int i = 0; i < Nodes.count; i++)
         {
@@ -409,6 +405,20 @@ void Bear_MoveTowardsPlayer()
             }
         }
     }
+}
+void Bear_MoveTowardsPlayer()
+{
+    if (!Bear.is_present) return;
+
+    Clock pathClock = {};
+    Measure_Start(pathClock);
+    v2 direction = DetermineNextPosition(Bear.position, Player.position);
+    float elapsed = Measure_Elapsed(pathClock);
+
+    TileType playerTile = TileAt(Player.position).type;
+    bool bearIsMoving = direction != INIT && playerTile != GRASS;
+
+    Debug_LogClosedNodes(direction);
 
     if (bearIsMoving)
     {
@@ -438,62 +448,57 @@ void Bear_MoveTowardsPlayer()
                                        BREATHING_FALLOFF_VALUE);
     SetProximityLevels(pan, lpRatio, volume);
 
-    if (Bear.position == Player.position)
-    {
-        Event_LevelFailure();
-    }
-    else if (bearIsMoving)
+    float walkingDelay = 0;
+    if (bearIsMoving)
     {
         Tile newBearPosition = TileAt(Bear.position);
 
-        // TODO: these are tweaking values, these should live in a config file
-        //  -> because then i also could HOT RELOAD them !
-        float afterPlayerDelay = 1;
-        float stepBaseDelay = 0.35;
+        float foot2 = FOOTSTEP_BASE_DELAY + ((rand() % 8) - 4) / 100.;
+        float foot3 = FOOTSTEP_BASE_DELAY + ((rand() % 10) - 5) / 100.;
+        float foot4 = FOOTSTEP_BASE_DELAY + ((rand() % 12) - 6) / 100.;
 
-        float decimal1 = stepBaseDelay + ((rand() % 8) - 4) / 100.;
-        float decimal2 = stepBaseDelay + ((rand() % 10) - 5) / 100.;
-        float decimal3 = stepBaseDelay + ((rand() % 12) - 6) / 100.;
+        float f1Delay = AFTER_PLAYER_DELAY;
+        float f2Delay = f1Delay + foot2;
+        float f3Delay = f2Delay + foot3;
+        float f4Delay = f3Delay + foot4;
 
-        float footstepVolumeFactor = 1.15;
+        walkingDelay = f4Delay + FOOTSTEP_BASE_DELAY;
 
         PlaybackSettings s1 = {};
         s1.pan = pan;
         s1.lowpass_filter = lpRatio;
         s1.volume = GetVolumeByDistance(Player.position,
                                         Bear.position,
-                                        1 * footstepVolumeFactor);
+                                        1 * FOOTSTEP_VOLUME_FACTOR);
 
         PlaybackSettings s2 = {};
         s2.pan = pan;
         s2.lowpass_filter = lpRatio;
         s2.volume = GetVolumeByDistance(Player.position,
                                         Bear.position,
-                                        1 * footstepVolumeFactor);
+                                        1 * FOOTSTEP_VOLUME_FACTOR);
         PlaybackSettings s3 = {};
         s3.pan = pan;
         s3.lowpass_filter = lpRatio;
-        // TODO: more config file stuff etc
         s3.volume = GetVolumeByDistance(Player.position,
                                         Bear.position,
-                                        0.85 * footstepVolumeFactor);
+                                        0.85 * FOOTSTEP_VOLUME_FACTOR);
         PlaybackSettings s4 = {};
         s4.pan = pan;
         s4.lowpass_filter = lpRatio;
         s4.volume = GetVolumeByDistance(Player.position,
                                         Bear.position,
-                                        0.75 * footstepVolumeFactor);
+                                        0.75 * FOOTSTEP_VOLUME_FACTOR);
 
-        PlayFootstepAudio(newBearPosition.type, afterPlayerDelay, s1);
-        PlayFootstepAudio(newBearPosition.type,
-                          afterPlayerDelay + decimal1,
+        PlayFootstepAudio(newBearPosition.type, f1Delay, s1);
+        PlayFootstepAudio(newBearPosition.type, f2Delay, s2);
+        PlayFootstepAudio(newBearPosition.type, f3Delay, s3);
+        PlayFootstepAudio(newBearPosition.type, f4Delay, s4);
+    }
 
-                          s2);
-        PlayFootstepAudio(newBearPosition.type,
-                          afterPlayerDelay + decimal1 + decimal2,
-                          s3);
-        PlayFootstepAudio(newBearPosition.type,
-                          afterPlayerDelay + decimal1 + decimal2 + decimal3,
-                          s4);
+    if (Bear.position == Player.position)
+    {
+        Player.inputs_locked = true;
+        ScheduleExecution(walkingDelay, Event_LevelFailure);
     }
 }
