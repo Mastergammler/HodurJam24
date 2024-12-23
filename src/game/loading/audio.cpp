@@ -119,7 +119,7 @@ void LoadStaticAudio()
     LoadOggAsPcm(Audio.GameSuccessSound, "res/amb/s_victory.ogg");
 
     LoadOggAsPcm(Audio.OpenChest, "res/amb/s_open-chest.ogg");
-    LoadOggAsPcm(Audio.LockIn, "res/amb/s_lock-in.ogg");
+    LoadOggAsPcm(Audio.LockIn, "res/amb/s_locked-in.ogg");
     LoadOggAsPcm(Audio.ObtainKeys, "res/amb/s_obtain-keys.ogg");
     LoadOggAsPcm(Audio.UnlockDoor, "res/amb/s_unlock-door.ogg");
     LoadOggAsPcm(Audio.BearGrowl, "res/fx/s_bear-growl.ogg");
