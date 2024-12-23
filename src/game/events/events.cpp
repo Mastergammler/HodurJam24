@@ -7,7 +7,6 @@
 #include "../ui.h"
 
 // TODO: fix this, just detect the first bear level
-const int FIRST_LEVEL = 1;
 const int FIRST_BEAR_LEVEL = 10;
 
 void LoadFirstLevel()
@@ -56,7 +55,7 @@ void Event_LevelStart()
     PlayAudio(&Audio.LockIn, playback);
     audioDelay = Audio.LockIn.length_in_s - 1;
 
-    if (Ui.current_level == FIRST_LEVEL && !Level.intro_played)
+    if (!Level.intro_played && !Level.map.bear_present)
     {
         PlaybackSettings playback = DirectionalAudio(direction);
         playback.voice = &Voiceline;
@@ -64,7 +63,7 @@ void Event_LevelStart()
         audioDelay += Audio.Intro.length_in_s;
         Level.intro_played = true;
     }
-    else if (Ui.current_level == FIRST_BEAR_LEVEL && !Level.bear_info_played)
+    else if (!Level.bear_info_played && Level.map.bear_present)
     {
         PlaybackSettings playback = DirectionalAudio(direction);
         playback.voice = &Voiceline;
