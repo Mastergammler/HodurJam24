@@ -14,17 +14,20 @@ static FILE* std_err = nullptr;
 void InitOutputStreams()
 {
     // pipeing out to the console that starts it
-    if (!AttachConsole(ATTACH_PARENT_PROCESS))
+    if (AttachConsole(ATTACH_PARENT_PROCESS))
     {
-        AllocConsole();
-    }
-    freopen_s(&std_out, "CONOUT$", "w", stdout);
-    freopen_s(&std_err, "CONOUT$", "w", stderr);
+        freopen_s(&std_out, "CONOUT$", "w", stdout);
+        freopen_s(&std_err, "CONOUT$", "w", stderr);
 
-    cout.clear();
-    cerr.clear();
-    wcout.clear();
-    wcerr.clear();
+        cout.clear();
+        cerr.clear();
+        wcout.clear();
+        wcerr.clear();
+    }
+    else
+    {
+        // AllocConsole();
+    }
 }
 
 /*void LogArguments(int argc, char* argv[])

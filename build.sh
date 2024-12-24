@@ -34,6 +34,10 @@ if [[ "$*" == *"-p"* ]]; then
     PROFILE="-ftime-trace -c"
 fi
 
+if [[ "$*" == *"-o"* ]]; then
+    OPTIMIZATION="-O3"
+fi
+
 WIN_SDK="$HOME/03-resources/libs/WindowsKits/10/Include/10.0.26100.0"
 WIN_LIB="$HOME/03-resources/libs/WindowsKits/10/Lib/10.0.26100.0"
 MSVC="$HOME/03-resources/libs/MSVC/14.40.33807"
@@ -68,9 +72,9 @@ MSVC_DEFAULTS="$TARGET $INCLUDES -D_AMD64_=1"
 PRE_COMPILE_START=$(date +%s%N)
 
 # h for headers
-if [[ "$*" == *"-h"* ]]; then
-    clang -c $C_FILES -o $C_FILES_OUTPUT $MSVC_DEFAULTS -w #-msse $LIB_PATHS $LINKED_LIBS
-    clang++ -x c++-header $PRECOMPILE_FILE -o $PRECOMPILE_OUTPUT $MSVC_DEFAULTS $CPP_STD $DEBUG
+if [[ "$*" == *"-h"* || "$*" == *"-o"* ]]; then
+    clang -c $C_FILES -o $C_FILES_OUTPUT $MSVC_DEFAULTS -w $OPTIMIZATION #-msse $LIB_PATHS $LINKED_LIBS
+    clang++ -x c++-header $PRECOMPILE_FILE -o $PRECOMPILE_OUTPUT $MSVC_DEFAULTS $CPP_STD $DEBUG $OPTIMIZATION
 fi
 
 PRE_COMPILE_END=$(date +%s%N)
@@ -78,7 +82,7 @@ START_TIME=$(date +%s%N)
 
 #TODO: cleaner setup for this
 
-clang++ $SOURCE_FILE $C_FILES_OUTPUT -o $OUTPUT_FILE $INCLUDE_PRECOMPILED $MSVC_DEFAULTS $CPP_STD $LIB_PATHS $LINKED_LIBS $OPTIONS
+clang++ $SOURCE_FILE $C_FILES_OUTPUT -o $OUTPUT_FILE $INCLUDE_PRECOMPILED $MSVC_DEFAULTS $CPP_STD $LIB_PATHS $LINKED_LIBS $OPTIONS $OPTIMIZATION
 COMPILE_STATUS=$?
 
 END_TIME=$(date +%s%N)

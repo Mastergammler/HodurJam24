@@ -14,9 +14,11 @@ if [ ! -d $ZIP_DIR ]; then
     mkdir $ZIP_DIR
 fi
 
-./build.sh $OUTPUT_DIR $EXEC_NAME
+./build.sh $OUTPUT_DIR $EXEC_NAME -o
 
-cp -r res $OUTPUT_DIR
-cp -r configs $OUTPUT_DIR
+if [ $? -eq 0 ]; then
+    cp -r res $OUTPUT_DIR
+    cp -r configs $OUTPUT_DIR
 
-zip -r $ZIP_DIR/$ZIP_NAME $OUTPUT_DIR/*
+    zip -r $ZIP_DIR/$ZIP_NAME $OUTPUT_DIR/*
+fi

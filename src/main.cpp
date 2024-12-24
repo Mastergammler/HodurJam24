@@ -27,7 +27,7 @@ int WinMain(HINSTANCE instance,
     Timer_Init();
     LogCmdArgs();
 
-    HWND window = InitializeWindow("EscapeRoomGame", instance, CloseProgram);
+    HWND window = InitializeWindow("Loading ...", instance, CloseProgram);
     // HDC hdc = GetDC(window);
 
     Game_Init(CloseProgram);

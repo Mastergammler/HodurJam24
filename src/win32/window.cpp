@@ -1,6 +1,8 @@
 #include "imports.h"
 #include "input.cpp"
 #include "module.h"
+#include <windef.h>
+#include <wingdi.h>
 
 // TODO: handle x-box-controller input
 
@@ -106,6 +108,7 @@ HWND InitializeWindow(string name, HINSTANCE instance, ExitCallback exitProgram)
     winClass.style = CS_HREDRAW | CS_VREDRAW;
     winClass.lpszClassName = name.c_str();
     winClass.lpfnWndProc = WindowCallback;
+    winClass.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
 
     RegisterClass(&winClass);
     return CreateWindow(winClass.lpszClassName,
