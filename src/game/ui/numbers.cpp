@@ -2,13 +2,31 @@
 
 void PlayNumberSound(int number, float delay)
 {
-    // sound only go to 19
-    assert(number > 0 && number < 20);
+    // sound only goes to 99
+    assert(number > 0 && number < 100);
 
-    int fifths = number / 5;
-    int rest = number % 5;
+    // TODO: handle number over 100 -> tewnties > 4
+    int twenties = number / 20;
+    int twentiesRest = number % 20;
+
+    int fifths = twentiesRest / 5;
+    int rest = twentiesRest % 5;
 
     bool interrupt = true;
+
+    if (twenties != 0)
+    {
+        // TODO: if i want extra delay in between, i should just create a longer
+        // tail?
+        //  -> but that obstructs then from the internal one? Dunno,
+        //  => Else i need to do everything via scheduling
+        int uiIdxSingles = Audio.num_mapping[twenties + 7];
+        SchedulePlayback(&Audio.ui[uiIdxSingles],
+                         {&GlobalMono, interrupt},
+                         delay);
+        interrupt = false;
+    }
+
     if (rest != 0)
     {
         int uiIdxSingles = Audio.num_mapping[rest];
