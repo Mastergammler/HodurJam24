@@ -71,6 +71,13 @@ void Event_LevelStart()
         Level.bear_info_played = true;
     }
 
+    if (Level.map.bear_present)
+    {
+        PlayAudio(&Audio.ProximityYellow, {&ProximityYellow, true, true, 0});
+        PlayAudio(&Audio.ProximityRed, {&ProximityRed, true, true, 0});
+        PlayAudio(&Audio.BearBreathingLoop, {&Bear.breathing, true, true, 0});
+    }
+
     ScheduleExecution(audioDelay, UnlockPlayer);
     ScheduleExecution(audioDelay, SetBearAudioLevels);
     SchedulePlayback(&Audio.DangerSound, {&GlobalStereo}, audioDelay);

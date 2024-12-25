@@ -3,7 +3,8 @@
 #TODO: proper version management
 VERSION="0.1"
 OUTPUT_DIR="release"
-ZIP_DIR="publish"
+#relative to output dir
+ZIP_DIR="../publish"
 EXEC_NAME=escape-room.exe
 ZIP_NAME="escape-room-unseen-wilderness-v$VERSION.zip"
 
@@ -20,5 +21,9 @@ if [ $? -eq 0 ]; then
     cp -r res $OUTPUT_DIR
     cp -r configs $OUTPUT_DIR
 
-    zip -r $ZIP_DIR/$ZIP_NAME $OUTPUT_DIR/*
+    cd $OUTPUT_DIR
+    
+    # pack the contents without a parent directory
+    # expecting out dir to be a single dir path!!!
+    zip -r $ZIP_DIR/$ZIP_NAME *
 fi

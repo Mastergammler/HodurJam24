@@ -39,6 +39,9 @@ void LoadLevel(int level)
     Level.number = level;
     Level.player_has_key = false;
     Level.map = LoadMap(Level.level_name);
+    Logf("Loading level %s (%i tiles)",
+         Level.level_name.c_str(),
+         Level.map.total_tiles);
 
     delete Nodes.items;
     Nodes.max_size = Level.map.total_tiles;
@@ -55,8 +58,6 @@ void LoadLevel(int level)
         Bear.is_present = true;
         Logf("Bear start position: (%i,%i)", Bear.position.x, Bear.position.y);
 
-        // TODO: breathing should be hearable from the start ...
-        // - same for proximity ..., if the bear is there ...
         PlayAudio(&Audio.ProximityYellow, {&ProximityYellow, true, true, 0});
         PlayAudio(&Audio.ProximityRed, {&ProximityRed, true, true, 0});
         PlayAudio(&Audio.BearBreathingLoop, {&Bear.breathing, true, true, 0});
@@ -65,10 +66,6 @@ void LoadLevel(int level)
     {
         Bear.is_present = false;
     }
-
-    Logf("Loading level %s (%i tiles)",
-         Level.level_name.c_str(),
-         Level.map.total_tiles);
 
     Event_LevelStart();
 }
