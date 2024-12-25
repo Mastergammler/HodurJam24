@@ -8,6 +8,7 @@ struct Bear
     v2 position;
     VoiceSettings body;
     VoiceSettings breathing;
+    VoiceSettings foley;
 
     /**
      * Distance in steps from the player

@@ -196,15 +196,13 @@ v2 DetermineNextPosition(v2 startPosition, v2 targetPosition)
     return nextMove;
 }
 
-void PlayFootstepAudio(TileType type, float delay, PlaybackSettings settings)
+void PlayTileAudio(TileType type, float delay, PlaybackSettings settings)
 {
     if (Audio.bear_fx_mapping.find(type) != Audio.bear_fx_mapping.end())
     {
         FxInfo fxInfo = Audio.bear_fx_mapping[type];
         int idxOffset = rand() % fxInfo.count;
         AudioData* audio = &Audio.fx[fxInfo.start_idx + idxOffset];
-
-        settings.voice = &Bear.body;
 
         SchedulePlayback(audio, settings, delay);
     }
@@ -468,36 +466,49 @@ void Bear_MoveTowardsPlayer(bool moveBear = true)
 
         walkingDelay = f4Delay + FOOTSTEP_BASE_DELAY;
 
-        PlaybackSettings s1 = {};
+        PlaybackSettings s1 = {&Bear.body};
         s1.pan = pan;
         s1.lowpass_filter = lpRatio;
         s1.volume = GetVolumeByDistance(Player.position,
                                         Bear.position,
                                         1 * FOOTSTEP_VOLUME_FACTOR);
 
-        PlaybackSettings s2 = {};
+        PlaybackSettings s2 = {&Bear.body};
         s2.pan = pan;
         s2.lowpass_filter = lpRatio;
         s2.volume = GetVolumeByDistance(Player.position,
                                         Bear.position,
                                         1 * FOOTSTEP_VOLUME_FACTOR);
-        PlaybackSettings s3 = {};
+        PlaybackSettings s3 = {&Bear.body};
         s3.pan = pan;
         s3.lowpass_filter = lpRatio;
         s3.volume = GetVolumeByDistance(Player.position,
                                         Bear.position,
                                         0.85 * FOOTSTEP_VOLUME_FACTOR);
-        PlaybackSettings s4 = {};
+        PlaybackSettings s4 = {&Bear.body};
         s4.pan = pan;
         s4.lowpass_filter = lpRatio;
         s4.volume = GetVolumeByDistance(Player.position,
                                         Bear.position,
                                         0.75 * FOOTSTEP_VOLUME_FACTOR);
 
-        PlayFootstepAudio(newBearPosition.type, f1Delay, s1);
-        PlayFootstepAudio(newBearPosition.type, f2Delay, s2);
-        PlayFootstepAudio(newBearPosition.type, f3Delay, s3);
-        PlayFootstepAudio(newBearPosition.type, f4Delay, s4);
+        PlaybackSettings foley = {&Bear.foley};
+        foley.pan = pan;
+        foley.lowpass_filter = lpRatio;
+        foley.volume = GetVolumeByDistance(Player.position,
+                                           Bear.position,
+                                           1.5 * FOOTSTEP_VOLUME_FACTOR);
+
+        PlayTileAudio(newBearPosition.type, f1Delay, s1);
+        PlayTileAudio(newBearPosition.type, f2Delay, s2);
+        PlayTileAudio(newBearPosition.type, f3Delay, s3);
+        PlayTileAudio(newBearPosition.type, f4Delay, s4);
+        // not playing those, because they are inaudable anyway when the bear is
+        // close enough beacause of the proximity sounds
+        /*PlayTileAudio(FOLEY, f1Delay, foley);
+        PlayTileAudio(FOLEY, f2Delay, foley);
+        PlayTileAudio(FOLEY, f3Delay, foley);
+        PlayTileAudio(FOLEY, f4Delay, foley);*/
     }
 
     if (Bear.position == Player.position)

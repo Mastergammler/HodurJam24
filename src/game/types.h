@@ -93,7 +93,7 @@ enum TileType
     /**
      * Workaround 3
      */
-    POCKET
+    FOLEY
 };
 
 struct FxInfo

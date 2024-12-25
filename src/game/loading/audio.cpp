@@ -15,14 +15,15 @@ static unordered_map<string, TileType> FX_MAPPING = {
                                         //  -> I have to find another solution
                                         {"nope-sound", NOOP},
                                         {"huh", HUH},
-                                        {"pocket-keys", POCKET},
+                                        {"pocket-keys", FOLEY},
 };
 
 static unordered_map<string, TileType> BEAR_FX_MAPPING = {
                                         {"footsteps-bear-stone", STONE},
                                         {"footsteps-bear-carpet", CARPET},
                                         {"footsteps-bear-wood", WOOD},
-                                        {"footsteps-bear-grass", GRASS}
+                                        {"footsteps-bear-grass", GRASS},
+                                        {"foley-bear", FOLEY}
 
 };
 

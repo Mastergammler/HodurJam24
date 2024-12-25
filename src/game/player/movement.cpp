@@ -194,7 +194,7 @@ void HandleMovement()
             if (nextTile.type == GRASS) delay = 0.125;
 
             // TODO: delay for grass sounds, because else it feels strange
-            PlayTileAudio(POCKET, INIT, 0.75, delay);
+            PlayTileAudio(FOLEY, INIT, 0.75, delay);
         }
         Bear_MoveTowardsPlayer();
     }
